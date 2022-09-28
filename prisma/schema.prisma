@@ -43,7 +43,6 @@ model User {
   registrationDate DateTime @default(now())
   startDate        DateTime @default(now())
   endDateForPlan   String
-  active           Boolean
 
   plan   Plan   @relation(fields: [planId], references: [id])
   planId String
