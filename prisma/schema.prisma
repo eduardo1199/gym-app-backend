@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String @id
+  name      String
+  year      String
+  cpf       String
+  birthDate String
+}
+
+model Machine {
+  id          String  @id
+  name        String
+  description String
+  maintenance Boolean
+}
+
+model Plan {
+  id         String  @id
+  name       String
+  timeOfPlan Int
+  price      Decimal
+
+  users User[]
+}
+
+model User {
+  id               String   @id
+  name             String
+  age              String
+  weight           Decimal
+  cpf              Decimal
+  registrationDate DateTime @default(now())
+  startDate        DateTime @default(now())
+  endDateForPlan   String
+  active           Boolean
+
+  plan   Plan   @relation(fields: [planId], references: [id])
+  planId String
+}
