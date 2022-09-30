@@ -1,13 +1,17 @@
 import express from 'express';
+import cors from 'cors';
+
 import { getActualDateAndHours } from './utils';
+import { prisma } from './prismaClient';
+import { createAdmin, getAdmin } from './request/admin';
 
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
-app.get('/admin', (req, res) => {
-  
-});
+app.post('/admin', createAdmin);
+app.get('/admin', getAdmin);
 
 app.post('/user', (req, res) => {
   

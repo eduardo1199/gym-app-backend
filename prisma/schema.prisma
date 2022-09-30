@@ -11,22 +11,23 @@ datasource db {
 }
 
 model Admin {
-  id        String @id
+  id        String @default(uuid())
   name      String
   year      String
-  cpf       String
+  cpf       String @id
+  password  String
   birthDate String
 }
 
 model Machine {
-  id          String  @id
+  id          String  @id @default(uuid())
   name        String
   description String
   maintenance Boolean
 }
 
 model Plan {
-  id         String  @id
+  id         String  @id @default(uuid())
   name       String
   timeOfPlan Int
   price      Decimal
@@ -35,7 +36,7 @@ model Plan {
 }
 
 model User {
-  id               String   @id
+  id               String   @id @default(uuid())
   name             String
   age              String
   weight           Decimal
