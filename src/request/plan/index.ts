@@ -1,24 +1,40 @@
 import { Request, Response } from 'express';
 
+import { z } from 'zod';
+
 import { prisma } from '../../prismaClient';
+import { PlanSchema, PlanSchemaType } from '../../schema/plan';
 
 export  async function createdPlan(request: Request, response: Response) {
-  const planData = request.body;
+  const planData: PlanSchemaType = request.body;
 
   try {
+    const parsedPlan = PlanSchema.parse(planData);
+
     const plans = await prisma.plan.findMany();
 
     const planExists = 
-      plans.some((plan) => (plan.name === planData.name || plan.timeOfPlan === planData.timeOfPlan));
+      plans.some((plan) => (plan.name === parsedPlan.name || plan.timeOfPlan === parsedPlan.timeOfPlan));
   
     if(planExists) return response.status(400).json({ message: 'Já existe um plano com esse nome ou duração no sistema'});
   
     const plan = await prisma.plan.create({
-      data: planData
+      data: parsedPlan
     });
 
     return response.status(201).json(plan);
-  } catch (err) {
+  } catch (error) {
+    if(error instanceof z.ZodError) {
+      const errorsZodResponse = error.issues.map((issue) => {
+        return {
+          message: issue.message,
+          path: issue.path[0]
+        }
+      });
+
+      return response.status(401).json(errorsZodResponse);
+    }
+
     response.status(400).json({ message: 'Erro ao criar um novo plano!'});
   }
 };

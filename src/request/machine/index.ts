@@ -1,23 +1,38 @@
 import { Request, Response } from 'express';
 
+import { z } from 'zod';
+
 import { prisma } from '../../prismaClient';
+import { MachineSchema, MachineSchemaType } from '../../schema/machine';
 
 export async function createdMachine(request: Request, response: Response) {
-  const machineData = request.body;
+  const machineData: MachineSchemaType = request.body;
 
   try {
+    const parsedMachine = MachineSchema.parse(machineData);
+
     const machines = await prisma.machine.findMany();
 
-    const existMachineName =  machines.some((machine) => machine.name === machineData.name); 
+    const existMachineName =  machines.some((machine) => machine.name === parsedMachine.name); 
 
     if(existMachineName) return response.status(401).json({ message: 'Já existe máquina com esse nome!' });
 
     const machine = await prisma.machine.create({
-      data: machineData
+      data: parsedMachine
     });
 
     return response.status(201).json(machine);
-  } catch (err) {
+  } catch (error) {
+    if(error instanceof z.ZodError) {
+      const errorsZodResponse = error.issues.map((issue) => {
+        return {
+          message: issue.message,
+          path: issue.path[0]
+        }
+      });
+
+      return response.status(401).json(errorsZodResponse);
+    }
     return response.status(500).json({ message: 'Erro ao cadastrar máquina!' });
   }
 }

@@ -2,15 +2,20 @@ import { Request, Response } from 'express';
 import { add, compareAsc, formatDistance  } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 
+import { z } from 'zod';
+
 import { prisma } from '../../prismaClient';
+import { UserSchema, UserSchemaType } from '../../schema/user';
 
 export async function createdUser(request: Request, response: Response) {
-  const userBody = request.body;
+  const userBody: UserSchemaType = request.body;
 
   try {
+    const parsedUser = UserSchema.parse(userBody);
+
     const getUserExist = await prisma.user.findUnique({
       where: {
-        cpf: userBody.cpf
+        cpf: parsedUser.cpf
       }
     });
 
@@ -18,12 +23,12 @@ export async function createdUser(request: Request, response: Response) {
 
     const plan = await prisma.plan.findUnique({
       where: {
-        id: userBody.planId,
+        id: parsedUser.planId,
       }
     });
 
     const userData = {
-      ...userBody,
+      ...parsedUser,
       startDateForPlan: new Date(),
       endDateforPlan: add(new Date(), {
         days: plan?.timeOfPlan 
@@ -35,10 +40,19 @@ export async function createdUser(request: Request, response: Response) {
     });
 
     return response.status(201).json(user);
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    if(error instanceof z.ZodError) {
+      const errorsZodResponse = error.issues.map((issue) => {
+        return {
+          message: issue.message,
+          path: issue.path[0]
+        }
+      });
 
-    return response.status(500).json({ message: 'Erro ao cadastrar usuário!' })
+      return response.status(401).json(errorsZodResponse);
+    } else {
+      return response.status(500).json({ message: 'Erro ao cadastrar usuário!' })
+    }
   }
 }
 
@@ -133,7 +147,6 @@ export async function updateUser(request: Request, response: Response) {
 
     return response.status(201).json(user);
   } catch (err) {
-    console.log(err);
 
     return response.status(500).json({ message: 'Erro ao atualizar usuário!' })
   }
