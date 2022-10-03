@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 
 import { prisma } from '../../prismaClient';
 
-export async function createAdmin(request: Request, response: Response) {
+export async function createdAdmin(request: Request, response: Response) {
   const dataAdmin = request.body;
 
   try {

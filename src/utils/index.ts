@@ -1,4 +1,6 @@
-export function getActualDateAndHours() {
+
+
+export function isActivePlanForUser(startDateForPlan: Date) {
   const date = new Date().toLocaleDateString('pt-BR', {
     second: 'numeric',
     day: '2-digit',
