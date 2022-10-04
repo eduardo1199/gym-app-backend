@@ -100,3 +100,26 @@ export async function updatePlan(request: Request, response: Response) {
     return response.status(500).json({ message: 'Erro ao atualizar plano!' });
   }
 }
+
+export async function getQuantityUsersWithPlan(request: Request, response: Response) {
+  const planId = request.params.id;
+
+  try {
+    const total = await prisma.plan.findUnique({
+      where: {
+        id: planId,
+      },
+      include: {
+      _count: {
+        select: {
+          users: true
+        }
+      }
+     },
+    });
+
+    return response.status(201).json(total?._count ?? 0);
+  } catch (err) {
+    return response.status(500).json({ message: 'Erro ao buscar quantidade de usuários em uma plano!' });
+  }
+}
