@@ -42,22 +42,44 @@ export async function createdAdmin(request: Request, response: Response) {
   }
 }
 
-export async function getAdmin(request: Request, response: Response) {
+export async function getAuthenticationAdmin(request: Request, response: Response) {
   const dataAdmin = request.body;
 
   try {
-    const admin = await prisma.admin.findUnique({
+    const admin = await prisma.admin.findUniqueOrThrow({
       where: {
         cpf: dataAdmin.cpf,
       },
+      select: {
+        id: true,
+        password: true
+      }
     });
-
-    if(!admin?.id) return response.status(401).json({ message: 'Usuário administrador não existe' });
 
     if(admin.password !== dataAdmin.password) return response.status(401).json({ message: 'Senha incorreta!' });
 
+    return response.status(200).json({ id: admin.id });
+  } catch (error) {
+    return response.status(400).json({ message: 'Dados incorretos ou não existe usuário com os dados informados!' });
+  }
+}
+
+export async function getAdmin(request: Request, response: Response) {
+  const dataAdmin = request.params.id;
+
+  try {
+    const admin = await prisma.admin.findUniqueOrThrow({
+      where: {
+        cpf: dataAdmin,
+      },
+      select: {
+        name: true,
+        year: true,
+      }
+    });
+
     return response.status(200).json(admin);
   } catch (error) {
-    return response.status(400).json({ error: error });
+    return response.status(400).json({ message: 'Dados incorretos ou não existe usuário com os dados informados!' });
   }
 }

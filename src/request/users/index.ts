@@ -101,6 +101,24 @@ export async function getUser(request: Request, response: Response) {
   }
 }
 
+export async function authenticationUser(request: Request, response: Response) {
+  const { cpf } = request.body;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        cpf,
+      },
+    });
+
+    if(!user) response.status(400).json({ message: 'Não foi encontrado usuário com essa informação!' });
+    
+    return response.status(200).json({ id: user?.id })
+  } catch (err) {
+    return response.status(500).json({ message: 'Erro de autenticação!' });
+  }
+}
+
 export async function deleteUser(request: Request, response: Response) {
   const userId = request.params.id;
 
