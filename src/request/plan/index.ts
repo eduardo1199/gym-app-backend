@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 
 import { prisma } from '../../prismaClient';
-import { PlanSchema, PlanSchemaType } from '../../schema/plan';
+import { PlanSchema } from '../../schema/plan';
 
 export  async function createdPlan(request: Request, response: Response) {
   const parsedPlan = PlanSchema.parse(request.body);
@@ -112,28 +112,5 @@ export async function updatePlan(request: Request, response: Response) {
     return response.status(201).json(newPlan);
   } catch (err) {
     return response.status(500).json({ message: 'Erro ao atualizar plano!' });
-  }
-}
-
-export async function getQuantityUsersWithPlan(request: Request, response: Response) {
-  const planId = request.params.id;
-
-  try {
-    const total = await prisma.plan.findUnique({
-      where: {
-        id: planId,
-      },
-      include: {
-      _count: {
-        select: {
-          users: true
-        }
-      }
-     },
-    });
-
-    return response.status(201).json(total?._count ?? 0);
-  } catch (err) {
-    return response.status(500).json({ message: 'Erro ao buscar quantidade de usuários em uma plano!' });
   }
 }

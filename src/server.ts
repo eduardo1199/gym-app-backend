@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 
 import { createdAdmin, getAuthenticationAdmin, getAdmin } from './request/admin';
-import { createdPlan, getPlan, getPlans, deletePlan, updatePlan, getQuantityUsersWithPlan } from './request/plan';
+import { createdPlan, getPlan, getPlans, deletePlan, updatePlan } from './request/plan';
 import { createdUser, deleteUser, getAllUsers, getUser, updateUser, authenticationUser } from './request/users';
 import { createdMachine, deleteMachine, getAllMachines, updateMachine } from './request/machine';
 
@@ -18,7 +18,6 @@ app.get('/admin/:id', getAdmin);
 app.post('/plan', createdPlan);
 app.get('/plan/:id', getPlan);
 app.get('/plans', getPlans);
-app.get('/plan/:id/users', getQuantityUsersWithPlan);
 app.put('/plan/:id', updatePlan);
 app.delete('/plan/:id', deletePlan);
 
