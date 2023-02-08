@@ -5,17 +5,15 @@ import ptBR from 'date-fns/locale/pt-BR';
 import { z } from 'zod';
 
 import { prisma } from '../../prismaClient';
-import { UserSchema, UserSchemaType } from '../../schema/user';
+import { UserSchema } from '../../schema/user';
 
 export async function createdUser(request: Request, response: Response) {
-  const userBody: UserSchemaType = request.body;
+  const userBody = UserSchema.parse(request.body);
 
   try {
-    const parsedUser = UserSchema.parse(userBody);
-
     const getUserExist = await prisma.user.findUnique({
       where: {
-        cpf: parsedUser.cpf
+        cpf: userBody.cpf
       }
     });
 
@@ -23,14 +21,16 @@ export async function createdUser(request: Request, response: Response) {
 
     const plan = await prisma.plan.findFirstOrThrow({
       where: {
-        id: parsedUser.planId,
+        id: userBody.planId,
       }
     });
 
+    const initialDateFromPlan = userBody?.startDateForPlan ? new Date(userBody.startDateForPlan) : new Date()
+
     const userData = {
-      ...parsedUser,
-      startDateForPlan: new Date(),
-      endDateforPlan: add(new Date(), {
+      ...userBody,
+      startDateForPlan: initialDateFromPlan,
+      endDateforPlan: add(initialDateFromPlan, {
         days: plan.timeOfPlan 
       }),
     }
@@ -83,11 +83,13 @@ export async function getUser(request: Request, response: Response) {
   const userId = request.params.id;
 
   try {
-    const user = await prisma.user.findFirstOrThrow({
+    const user = await prisma.user.findUnique({
       where: {
-        cpf: userId,
+        id: userId
       },
     });
+
+    if(!user?.id) return response.status(404).json({ message: 'Usuário não existe!'});
 
     const isActive = compareAsc(user?.endDateforPlan!, new Date());
 
@@ -129,7 +131,7 @@ export async function deleteUser(request: Request, response: Response) {
   try {
     const user = await prisma.user.delete({
       where: {
-        cpf: userId
+        id: userId
       }
     });
 
@@ -140,36 +142,32 @@ export async function deleteUser(request: Request, response: Response) {
 }
 
 export async function updateUser(request: Request, response: Response) {
-  const userBody = request.body;
+  const userData = request.body
   const userId = request.params.id;
 
   try {
     const plan = await prisma.plan.findUniqueOrThrow({
       where: {
-        id: userBody.planId
+        id: userData.planId
       }
     });
+
+    const initialForPlanDate = userData?.startDateForPlan ? new Date(userData.startDateForPlan) : new Date();
+
+    const addTimeForPlan = add(initialForPlanDate, { days: plan.timeOfPlan })
     
     const user = await prisma.user.update({
       where: {
-        cpf: userId,
+        id: userId
       },
       data: {
-        age: userBody.age,
-        cpf: userBody.cpf,
-        name: userBody.name,
-        planId: userBody.planId,
-        startDateForPlan: userBody.startDateForPlan,
-        weight: userBody.weight,
-        endDateforPlan: add(new Date(userBody.startDateForPlan), {
-          days: plan.timeOfPlan
-        }),
+        ...userData,
+        endDateforPlan: addTimeForPlan,
       },
     });
 
     return response.status(201).json(user);
   } catch (err) {
-
     return response.status(500).json({ message: 'Erro ao atualizar usuário!' })
   }
 }

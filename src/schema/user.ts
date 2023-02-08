@@ -7,12 +7,12 @@ export const UserSchema = z.object({
   }),
   age: z.string({
     required_error: 'Data obrigatória!',
-    invalid_type_error: 'Data precisa ser no formato dd/MM/YYYY!'
   }),
   weight: z.number({
     required_error: 'Peso obrigatória!',
     invalid_type_error: 'Peso precisa ser um número!'
   }).positive(),
+  startDateForPlan: z.string().optional(),
   cpf: z.string({
     required_error: 'CPF obrigatório!',
     invalid_type_error: 'Formator de CPF inválido!'

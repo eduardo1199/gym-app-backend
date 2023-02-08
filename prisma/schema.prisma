@@ -49,4 +49,6 @@ model User {
 
   plan   Plan?   @relation(fields: [planId], references: [id])
   planId String?
+
+  @@unique([id])
 }
