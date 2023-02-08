@@ -17,10 +17,6 @@ export const UserSchema = z.object({
     required_error: 'CPF obrigatório!',
     invalid_type_error: 'Formator de CPF inválido!'
   }).max(14),
-  startDateForPlan: z.string({
-    required_error: 'Data de inicio de plano obrigatória!',
-    invalid_type_error: 'Data precisa ser no formato dd/MM/YYYY!'
-  }),
   planId: z.string({
     required_error: 'Plano precisa ser selecionado!',
   }),

@@ -47,6 +47,6 @@ model User {
   startDateForPlan DateTime
   endDateforPlan   DateTime
 
-  plan   Plan   @relation(fields: [planId], references: [id])
-  planId String
+  plan   Plan?   @relation(fields: [planId], references: [id])
+  planId String?
 }

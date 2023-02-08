@@ -21,7 +21,7 @@ export async function createdUser(request: Request, response: Response) {
 
     if(getUserExist?.cpf) return response.status(401).json({ message: 'Usuário já existe.' });
 
-    const plan = await prisma.plan.findUnique({
+    const plan = await prisma.plan.findFirstOrThrow({
       where: {
         id: parsedUser.planId,
       }
@@ -31,15 +31,17 @@ export async function createdUser(request: Request, response: Response) {
       ...parsedUser,
       startDateForPlan: new Date(),
       endDateforPlan: add(new Date(), {
-        days: plan?.timeOfPlan 
+        days: plan.timeOfPlan 
       }),
     }
-    
-     const user = await prisma.user.create({
-      data: userData,
+
+    const user = await prisma.user.create({
+      data: {
+        ...userData
+      },
     });
 
-    return response.status(201).json(user);
+    return response.status(201).json({ id: user.id });
   } catch (error) {
     if(error instanceof z.ZodError) {
       const errorsZodResponse = error.issues.map((issue) => {
@@ -51,6 +53,8 @@ export async function createdUser(request: Request, response: Response) {
 
       return response.status(401).json(errorsZodResponse);
     } else {
+      console.log(error);
+    
       return response.status(500).json({ message: 'Erro ao cadastrar usuário!' })
     }
   }
