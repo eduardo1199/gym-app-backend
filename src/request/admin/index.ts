@@ -6,7 +6,7 @@ import { prisma } from '../../prismaClient';
 import { AdminSchema, AdminSchemaType} from '../../schema/admin';
 
 export async function createdAdmin(request: Request, response: Response) {
-  const dataAdmin: AdminSchemaType = request.body;
+  const dataAdmin = request.body;
 
   try {
     const parsedAdmin = AdminSchema.parse(dataAdmin);
@@ -25,7 +25,7 @@ export async function createdAdmin(request: Request, response: Response) {
       }
     });
 
-    return response.status(201).json(admin);
+    return response.status(201).json({ id: admin.id });
   } catch (error) {
     if(error instanceof z.ZodError) {
       const errorsZodResponse = error.issues.map((issue) => {
@@ -35,10 +35,10 @@ export async function createdAdmin(request: Request, response: Response) {
         }
       });
 
-      return response.status(401).json(errorsZodResponse);
+      return response.status(400).json(errorsZodResponse);
     }
 
-    return response.status(400).json({ error: error });
+    return response.status(500).json({ error: error });
   }
 }
 
@@ -70,7 +70,7 @@ export async function getAdmin(request: Request, response: Response) {
   try {
     const admin = await prisma.admin.findUniqueOrThrow({
       where: {
-        cpf: dataAdmin,
+        id: dataAdmin
       },
       select: {
         name: true,

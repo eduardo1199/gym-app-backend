@@ -17,6 +17,8 @@ model Admin {
   cpf       String @id
   password  String
   birthDate String
+
+  @@unique([id])
 }
 
 model Machine {
