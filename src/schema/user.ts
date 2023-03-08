@@ -5,8 +5,8 @@ export const UserSchema = z.object({
     required_error: 'Nome obrigatório!',
     invalid_type_error: 'Nome precisa ser um texto!'
   }),
-  age: z.string({
-    required_error: 'Data obrigatória!',
+  age: z.number({
+    required_error: 'Idade obrigatória!',
   }),
   weight: z.number({
     required_error: 'Peso obrigatória!',

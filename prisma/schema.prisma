@@ -40,7 +40,7 @@ model Plan {
 model User {
   id               String   @default(uuid())
   name             String
-  age              String
+  age              Decimal
   weight           Decimal
   cpf              String   @id
   registrationDate DateTime @default(now())
