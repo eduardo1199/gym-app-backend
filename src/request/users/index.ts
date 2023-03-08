@@ -8,9 +8,9 @@ import { prisma } from '../../prismaClient';
 import { UserSchema } from '../../schema/user';
 
 export async function createdUser(request: Request, response: Response) {
-  const userBody = UserSchema.parse(request.body);
-
   try {
+    const userBody = UserSchema.parse(request.body);
+
     const getUserExist = await prisma.user.findUnique({
       where: {
         cpf: userBody.cpf
@@ -25,9 +25,9 @@ export async function createdUser(request: Request, response: Response) {
       }
     });
 
-    const initialDateFromPlan = userBody?.startDateForPlan ? userBody.startDateForPlan : new Date()
+    const initialDateFromPlan = userBody?.startDateForPlan ? new Date(userBody.startDateForPlan) : new Date()
     const parseEndDateOfPlan =  add(initialDateFromPlan, {
-      days: plan.timeOfPlan 
+      days: plan.timeOfPlan
     })
 
     const userData = {
@@ -61,9 +61,7 @@ export async function createdUser(request: Request, response: Response) {
       });
 
       return response.status(401).json(errorsZodResponse);
-    } else {
-      console.log(error);
-    
+    } else {    
       return response.status(500).json({ message: 'Erro ao cadastrar usuário!' })
     }
   }
@@ -74,7 +72,7 @@ export async function getAllUsers(request: Request, response: Response) {
     const users = await prisma.user.findMany();
 
     const serializeUsers = users.map((user) => {
-      const isActive = compareAsc(user.endDateforPlan, new Date());
+      const isActive = compareAsc(user.endDateforPlan, user.startDateForPlan);
   
       return {
         ...user,
@@ -100,12 +98,12 @@ export async function getUser(request: Request, response: Response) {
 
     if(!user?.id) return response.status(404).json({ message: 'Usuário não existe!'});
 
-    const isActive = compareAsc(user?.endDateforPlan!, new Date());
+    const isActive = compareAsc(user.endDateforPlan, user.startDateForPlan);
 
     const serializeUser = {
       ...user,
       isActive: isActive === -1 ? false : true,
-      timeFinishPlan: formatDistance(new Date(), user.endDateforPlan, {
+      timeFinishPlan: formatDistance(user.startDateForPlan, user.endDateforPlan, {
         locale: ptBR,   
       }),
     };
@@ -138,32 +136,30 @@ export async function deleteUser(request: Request, response: Response) {
   const userId = request.params.id;
 
   try {
-    const user = await prisma.user.delete({
+    await prisma.user.delete({
       where: {
         id: userId
       }
     });
 
-    return response.status(200).json(user);
+    return response.status(200).json({ message: 'Usuário excluido com sucesso!' });
   } catch (err) {
     return response.status(500).json({ message: 'Erro ao excluir usuário!' });
   }
 }
 
 export async function updateUser(request: Request, response: Response) {
-  const userData = request.body
+  const userData = UserSchema.parse(request.body)
   const userId = request.params.id;
 
   try {
-    const plan = await prisma.plan.findUniqueOrThrow({
+    const plan = await prisma.plan.findFirst({
       where: {
         id: userData.planId
       }
     });
 
-    const initialForPlanDate = userData?.startDateForPlan ? new Date(userData.startDateForPlan) : new Date();
-
-    const addTimeForPlan = add(initialForPlanDate, { days: plan.timeOfPlan })
+    const addTimeForPlan = add(new Date(userData.startDateForPlan!), { days: plan?.timeOfPlan ?? 0 })
     
     const user = await prisma.user.update({
       where: {
@@ -175,7 +171,7 @@ export async function updateUser(request: Request, response: Response) {
       },
     });
 
-    return response.status(201).json(user);
+    return response.status(201).json({ message: 'Aluno atualizado com sucesso!' });
   } catch (err) {
     return response.status(500).json({ message: 'Erro ao atualizar usuário!' })
   }
