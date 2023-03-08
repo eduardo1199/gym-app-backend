@@ -25,19 +25,28 @@ export async function createdUser(request: Request, response: Response) {
       }
     });
 
-    const initialDateFromPlan = userBody?.startDateForPlan ? new Date(userBody.startDateForPlan) : new Date()
+    const initialDateFromPlan = userBody?.startDateForPlan ? userBody.startDateForPlan : new Date()
+    const parseEndDateOfPlan =  add(initialDateFromPlan, {
+      days: plan.timeOfPlan 
+    })
 
     const userData = {
       ...userBody,
       startDateForPlan: initialDateFromPlan,
-      endDateforPlan: add(initialDateFromPlan, {
-        days: plan.timeOfPlan 
-      }),
+      endDateforPlan: parseEndDateOfPlan
     }
+
+    const { age, cpf, endDateforPlan , name, planId, startDateForPlan, weight } = userData
 
     const user = await prisma.user.create({
       data: {
-        ...userData
+        age,
+        cpf,
+        endDateforPlan,
+        name,
+        planId,
+        startDateForPlan,
+        weight
       },
     });
 
