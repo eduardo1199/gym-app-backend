@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 
 import { prisma } from '../../prismaClient';
-import { MachineSchema, MachineSchemaType } from '../../schema/machine';
+import { MachineSchema, MachineSchemaType } from '../../schemas/machine';
 
 export async function createdMachine(request: Request, response: Response) {
   const machineData: MachineSchemaType = request.body;

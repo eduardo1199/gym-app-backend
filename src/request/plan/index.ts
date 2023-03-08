@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 
 import { prisma } from '../../prismaClient';
-import { PlanSchema } from '../../schema/plan';
+import { PlanSchema } from '../../schemas/plan';
 
 export  async function createdPlan(request: Request, response: Response) {
   const parsedPlan = PlanSchema.parse(request.body);

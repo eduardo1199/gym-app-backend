@@ -5,7 +5,7 @@ import ptBR from 'date-fns/locale/pt-BR';
 import { z } from 'zod';
 
 import { prisma } from '../../prismaClient';
-import { UserSchema } from '../../schema/user';
+import { UserSchema } from '../../schemas/user';
 
 export async function createdUser(request: Request, response: Response) {
   try {

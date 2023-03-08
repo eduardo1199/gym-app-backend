@@ -3,13 +3,11 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 
 import { prisma } from '../../prismaClient';
-import { AdminSchema, AdminSchemaType} from '../../schema/admin';
+import { AdminAuthenticationSchema, AdminIdSchema, AdminSchema} from '../../schemas/admin';
 
 export async function createdAdmin(request: Request, response: Response) {
-  const dataAdmin = request.body;
-
   try {
-    const parsedAdmin = AdminSchema.parse(dataAdmin);
+    const parsedAdmin = AdminSchema.parse(request.body);
 
     const getAdmin = await prisma.admin.findUnique({
       where: {
@@ -43,12 +41,12 @@ export async function createdAdmin(request: Request, response: Response) {
 }
 
 export async function getAuthenticationAdmin(request: Request, response: Response) {
-  const dataAdmin = request.body;
-
   try {
+    const { cpf, password } = AdminAuthenticationSchema.parse(request.body);
+
     const admin = await prisma.admin.findUniqueOrThrow({
       where: {
-        cpf: dataAdmin.cpf,
+        cpf
       },
       select: {
         id: true,
@@ -56,21 +54,32 @@ export async function getAuthenticationAdmin(request: Request, response: Respons
       }
     });
 
-    if(admin.password !== dataAdmin.password) return response.status(401).json({ message: 'Senha incorreta!' });
+    if(admin.password !== password) return response.status(401).json({ message: 'Senha incorreta!' });
 
     return response.status(200).json({ id: admin.id });
-  } catch (error) {
-    return response.status(400).json({ message: 'Dados incorretos ou não existe usuário com os dados informados!' });
+  }  catch (error) {
+    if(error instanceof z.ZodError) {
+      const errorsZodResponse = error.issues.map((issue) => {
+        return {
+          message: issue.message,
+          path: issue.path[0]
+        }
+      });
+
+      return response.status(400).json(errorsZodResponse);
+    }
+
+    return response.status(500).json({ error: error });
   }
 }
 
 export async function getAdmin(request: Request, response: Response) {
-  const dataAdmin = request.params.id;
-
   try {
+    const { id } = AdminIdSchema.parse(request.params);
+
     const admin = await prisma.admin.findUniqueOrThrow({
       where: {
-        id: dataAdmin
+        id
       },
       select: {
         name: true,
@@ -80,6 +89,17 @@ export async function getAdmin(request: Request, response: Response) {
 
     return response.status(200).json(admin);
   } catch (error) {
-    return response.status(400).json({ message: 'Dados incorretos ou não existe usuário com os dados informados!' });
+    if(error instanceof z.ZodError) {
+      const errorsZodResponse = error.issues.map((issue) => {
+        return {
+          message: issue.message,
+          path: issue.path[0]
+        }
+      });
+
+      return response.status(400).json(errorsZodResponse);
+    }
+
+    return response.status(500).json({ error: error });
   }
 }
