@@ -23,6 +23,7 @@ import {
   getAllMachines,
   updateMachine,
 } from './request/machine'
+import { env } from './env'
 
 const app = express()
 
@@ -51,4 +52,4 @@ app.put('/machine/:id', updateMachine)
 app.delete('/machine/:id', deleteMachine)
 app.get('/machines', getAllMachines)
 
-app.listen(3434)
+app.listen(env.PORT)
