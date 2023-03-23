@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const MachineSchema = z.object({
+export const MachineRequestCreatedSchema = z.object({
   name: z.string({
     required_error: 'Nome obrigatório!',
     invalid_type_error: 'Nome precisa ser do tipo texto!',
@@ -17,4 +17,12 @@ export const MachineSchema = z.object({
   }),
 })
 
-export type MachineSchemaType = z.infer<typeof MachineSchema>
+export const MachineRequestUpdateSchema = z.object({
+  name: z.string().optional(),
+  description: z.string().max(100).optional(),
+  maintenance: z.boolean().optional(),
+})
+
+export const MachineIdSchema = z.object({
+  id: z.string().uuid(),
+})
