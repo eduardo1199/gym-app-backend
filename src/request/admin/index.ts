@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 
 import { z } from 'zod'
+import { StatusCodeErrors } from '../../err/status.code-errors'
 
 import { prisma } from '../../prismaClient'
 import {
@@ -11,26 +12,34 @@ import {
 
 export async function createdAdmin(request: Request, response: Response) {
   try {
-    const parsedAdmin = AdminSchema.parse(request.body)
+    const { birthDate, cpf, name, password, year } = AdminSchema.parse(
+      request.body,
+    )
 
     const getAdmin = await prisma.admin.findUnique({
       where: {
-        cpf: parsedAdmin.cpf,
+        cpf,
       },
     })
 
     if (getAdmin?.cpf)
       return response
-        .status(401)
+        .status(StatusCodeErrors.UNAUTHORIZED)
         .json({ message: 'Usuário administrador já existe' })
 
-    const admin = await prisma.admin.create({
+    await prisma.admin.create({
       data: {
-        ...parsedAdmin,
+        birthDate,
+        cpf,
+        name,
+        password,
+        year,
       },
     })
 
-    return response.status(201).json({ id: admin.id })
+    return response
+      .status(StatusCodeErrors.CREATED)
+      .send('Cadastro realizado com sucesso!')
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errorsZodResponse = error.issues.map((issue) => {
@@ -40,10 +49,14 @@ export async function createdAdmin(request: Request, response: Response) {
         }
       })
 
-      return response.status(400).json(errorsZodResponse)
+      return response
+        .status(StatusCodeErrors.BAD_REQUEST)
+        .json(errorsZodResponse)
     }
 
-    return response.status(500).json({ error })
+    return response
+      .status(StatusCodeErrors.INTERNAL_SERVER_ERROR)
+      .send({ error })
   }
 }
 
@@ -54,20 +67,24 @@ export async function getAuthenticationAdmin(
   try {
     const { cpf, password } = AdminAuthenticationSchema.parse(request.body)
 
-    const admin = await prisma.admin.findUniqueOrThrow({
+    const admin = await prisma.admin.findUnique({
       where: {
         cpf,
       },
-      select: {
-        id: true,
-        password: true,
-      },
     })
 
-    if (admin.password !== password)
-      return response.status(401).json({ message: 'Senha incorreta!' })
+    if (!admin?.cpf) {
+      return response
+        .status(StatusCodeErrors.BAD_REQUEST)
+        .json({ message: 'Usuário não existe no sistema!' })
+    }
 
-    return response.status(200).json({ id: admin.id })
+    if (admin?.password !== password)
+      return response
+        .status(StatusCodeErrors.BAD_REQUEST)
+        .json({ message: 'Senha incorreta!' })
+
+    return response.status(StatusCodeErrors.SUCCESS).json(admin.id)
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errorsZodResponse = error.issues.map((issue) => {
@@ -77,10 +94,14 @@ export async function getAuthenticationAdmin(
         }
       })
 
-      return response.status(400).json(errorsZodResponse)
+      return response
+        .status(StatusCodeErrors.BAD_REQUEST)
+        .json(errorsZodResponse)
     }
 
-    return response.status(500).json({ error })
+    return response
+      .status(StatusCodeErrors.INTERNAL_SERVER_ERROR)
+      .json({ error })
   }
 }
 
@@ -98,7 +119,7 @@ export async function getAdmin(request: Request, response: Response) {
       },
     })
 
-    return response.status(200).json(admin)
+    return response.status(StatusCodeErrors.SUCCESS).json(admin)
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errorsZodResponse = error.issues.map((issue) => {
@@ -108,9 +129,13 @@ export async function getAdmin(request: Request, response: Response) {
         }
       })
 
-      return response.status(400).json(errorsZodResponse)
+      return response
+        .status(StatusCodeErrors.BAD_REQUEST)
+        .json(errorsZodResponse)
     }
 
-    return response.status(500).json({ error })
+    return response
+      .status(StatusCodeErrors.INTERNAL_SERVER_ERROR)
+      .json({ error })
   }
 }
