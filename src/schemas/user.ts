@@ -21,9 +21,26 @@ export const UserSchema = z.object({
       invalid_type_error: 'Formator de CPF inválido!',
     })
     .max(14),
-  planId: z.string({
-    required_error: 'Plano precisa ser selecionado!',
-  }),
+  planId: z
+    .string({
+      required_error: 'Plano precisa ser selecionado!',
+    })
+    .uuid(),
 })
 
-export type UserSchemaType = z.infer<typeof UserSchema>
+export const ParamsIdRequestSchema = z.object({
+  id: z.string().uuid(),
+})
+
+export const AuthenticationUserBodySchema = z.object({
+  cpf: z.string(),
+})
+
+export const UserEditSchema = z.object({
+  name: z.string().optional(),
+  age: z.number().optional(),
+  weight: z.number().positive().optional(),
+  startDateForPlan: z.string().optional(),
+  cpf: z.string().max(14).optional(),
+  planId: z.string().uuid().optional(),
+})

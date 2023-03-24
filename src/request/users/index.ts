@@ -1,60 +1,67 @@
 import { Request, Response } from 'express'
-import { add, compareAsc, formatDistance } from 'date-fns'
+import { add, compareAsc, formatDistance, subDays } from 'date-fns'
 import ptBR from 'date-fns/locale/pt-BR'
 
 import { z } from 'zod'
 
 import { prisma } from '../../prismaClient'
-import { UserSchema } from '../../schemas/user'
+import {
+  AuthenticationUserBodySchema,
+  ParamsIdRequestSchema,
+  UserEditSchema,
+  UserSchema,
+} from '../../schemas/user'
+import { StatusCodeErrors } from '../../err/status.code-errors'
 
 export async function createdUser(request: Request, response: Response) {
   try {
-    const userBody = UserSchema.parse(request.body)
+    const { age, cpf, name, planId, weight, startDateForPlan } =
+      UserSchema.parse(request.body)
 
     const getUserExist = await prisma.user.findUnique({
       where: {
-        cpf: userBody.cpf,
+        cpf,
       },
     })
 
-    if (getUserExist?.cpf)
-      return response.status(401).json({ message: 'Usuário já existe.' })
+    if (getUserExist)
+      return response
+        .status(StatusCodeErrors.BAD_REQUEST)
+        .json({ message: 'Usuário já existe.' })
 
     const plan = await prisma.plan.findFirstOrThrow({
       where: {
-        id: userBody.planId,
+        id: planId,
       },
     })
 
-    const initialDateFromPlan = userBody?.startDateForPlan
-      ? new Date(userBody.startDateForPlan)
+    const initialDateToPlan = startDateForPlan
+      ? new Date(startDateForPlan)
       : new Date()
-    const parseEndDateOfPlan = add(initialDateFromPlan, {
+
+    const parseEndDateToPlan = add(initialDateToPlan, {
       days: plan.timeOfPlan,
     })
 
     const userData = {
-      ...userBody,
-      startDateForPlan: initialDateFromPlan,
-      endDateforPlan: parseEndDateOfPlan,
+      age,
+      cpf,
+      name,
+      weight,
+      startDateForPlan: initialDateToPlan,
+      endDateforPlan: parseEndDateToPlan,
+      planId,
     }
 
-    const { age, cpf, endDateforPlan, name, planId, startDateForPlan, weight } =
-      userData
-
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
-        age,
-        cpf,
-        endDateforPlan,
-        name,
-        planId,
-        startDateForPlan,
-        weight,
+        ...userData,
       },
     })
 
-    return response.status(201).json({ id: user.id })
+    return response
+      .status(StatusCodeErrors.CREATED)
+      .send('Aluno cadastrado com sucesso!')
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errorsZodResponse = error.issues.map((issue) => {
@@ -64,11 +71,11 @@ export async function createdUser(request: Request, response: Response) {
         }
       })
 
-      return response.status(401).json(errorsZodResponse)
-    } else {
       return response
-        .status(500)
-        .json({ message: 'Erro ao cadastrar usuário!' })
+        .status(StatusCodeErrors.BAD_REQUEST)
+        .json(errorsZodResponse)
+    } else {
+      return response.status(StatusCodeErrors.INTERNAL_SERVER_ERROR).json(error)
     }
   }
 }
@@ -86,28 +93,43 @@ export async function getAllUsers(request: Request, response: Response) {
       }
     })
 
-    return response.status(200).json(serializeUsers)
-  } catch (err) {
-    return response.status(500).json({ message: 'Erro ao buscar usuários!' })
+    return response.status(StatusCodeErrors.SUCCESS).json(serializeUsers)
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errorsZodResponse = error.issues.map((issue) => {
+        return {
+          message: issue.message,
+          path: issue.path[0],
+        }
+      })
+
+      return response
+        .status(StatusCodeErrors.BAD_REQUEST)
+        .json(errorsZodResponse)
+    } else {
+      return response.status(StatusCodeErrors.INTERNAL_SERVER_ERROR).json(error)
+    }
   }
 }
 
 export async function getUser(request: Request, response: Response) {
-  const userId = request.params.id
-
   try {
+    const { id } = ParamsIdRequestSchema.parse(request.params)
+
     const user = await prisma.user.findUnique({
       where: {
-        id: userId,
+        id,
       },
     })
 
     if (!user?.id)
-      return response.status(404).json({ message: 'Usuário não existe!' })
+      return response
+        .status(StatusCodeErrors.NOT_FOUND)
+        .json({ message: 'Usuário não existe!' })
 
     const isActive = compareAsc(user.endDateforPlan, user.startDateForPlan)
 
-    const serializeUser = {
+    const userResponse = {
       ...user,
       isActive: isActive !== -1,
       timeFinishPlan: formatDistance(
@@ -119,80 +141,158 @@ export async function getUser(request: Request, response: Response) {
       ),
     }
 
-    return response.status(200).json(serializeUser)
-  } catch (err) {
-    return response.status(500).json({ message: 'Erro ao buscar usuário!' })
+    return response.status(StatusCodeErrors.SUCCESS).json(userResponse)
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errorsZodResponse = error.issues.map((issue) => {
+        return {
+          message: issue.message,
+          path: issue.path[0],
+        }
+      })
+
+      return response
+        .status(StatusCodeErrors.BAD_REQUEST)
+        .json(errorsZodResponse)
+    } else {
+      return response.status(StatusCodeErrors.INTERNAL_SERVER_ERROR).json(error)
+    }
   }
 }
 
 export async function authenticationUser(request: Request, response: Response) {
-  const { cpf } = request.body
-
   try {
+    const { cpf } = AuthenticationUserBodySchema.parse(request.body)
+
     const user = await prisma.user.findUnique({
       where: {
         cpf,
       },
     })
 
-    if (!user)
-      response
-        .status(400)
-        .json({ message: 'Não foi encontrado usuário com essa informação!' })
+    if (user)
+      return response.status(StatusCodeErrors.SUCCESS).json({ id: user.id })
 
-    return response.status(200).json({ id: user?.id })
-  } catch (err) {
-    return response.status(500).json({ message: 'Erro de autenticação!' })
+    return response
+      .status(StatusCodeErrors.NOT_FOUND)
+      .json({ message: 'Não foi encontrado usuário com essa informação!' })
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errorsZodResponse = error.issues.map((issue) => {
+        return {
+          message: issue.message,
+          path: issue.path[0],
+        }
+      })
+
+      return response
+        .status(StatusCodeErrors.BAD_REQUEST)
+        .json(errorsZodResponse)
+    } else {
+      return response.status(StatusCodeErrors.INTERNAL_SERVER_ERROR).json(error)
+    }
   }
 }
 
 export async function deleteUser(request: Request, response: Response) {
-  const userId = request.params.id
-
   try {
+    const { id } = ParamsIdRequestSchema.parse(request.params)
+
     await prisma.user.delete({
       where: {
-        id: userId,
+        id,
       },
     })
 
     return response
       .status(200)
       .json({ message: 'Usuário excluido com sucesso!' })
-  } catch (err) {
-    return response.status(500).json({ message: 'Erro ao excluir usuário!' })
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errorsZodResponse = error.issues.map((issue) => {
+        return {
+          message: issue.message,
+          path: issue.path[0],
+        }
+      })
+
+      return response
+        .status(StatusCodeErrors.BAD_REQUEST)
+        .json(errorsZodResponse)
+    } else {
+      return response
+        .status(StatusCodeErrors.INTERNAL_SERVER_ERROR)
+        .json({ error })
+    }
   }
 }
 
 export async function updateUser(request: Request, response: Response) {
-  const userData = UserSchema.parse(request.body)
-  const userId = request.params.id
-
   try {
-    const plan = await prisma.plan.findFirst({
-      where: {
-        id: userData.planId,
-      },
-    })
+    const { id } = ParamsIdRequestSchema.parse(request.params)
 
-    const addTimeForPlan = add(new Date(userData.startDateForPlan!), {
-      days: plan?.timeOfPlan ?? 0,
-    })
+    const { planId, startDateForPlan, age, cpf, name, weight } =
+      UserEditSchema.parse(request.body)
 
-    const user = await prisma.user.update({
+    let plan
+    let endDateforPlan
+
+    if (planId) {
+      plan = await prisma.plan.findUnique({
+        where: {
+          id: planId,
+        },
+      })
+    }
+
+    if (startDateForPlan) {
+      endDateforPlan = add(new Date(startDateForPlan), {
+        days: plan?.timeOfPlan ?? 0,
+      })
+    } else {
+      endDateforPlan = add(new Date(), {
+        days: plan?.timeOfPlan ?? 0,
+      })
+    }
+
+    if (!plan) {
+      endDateforPlan = subDays(new Date(), 1)
+    }
+
+    await prisma.user.update({
       where: {
-        id: userId,
+        id,
       },
       data: {
-        ...userData,
-        endDateforPlan: addTimeForPlan,
+        name,
+        age,
+        cpf,
+        planId: plan?.id ?? null,
+        startDateForPlan,
+        endDateforPlan,
+        weight,
       },
     })
 
     return response
-      .status(201)
+      .status(StatusCodeErrors.CREATED)
       .json({ message: 'Aluno atualizado com sucesso!' })
-  } catch (err) {
-    return response.status(500).json({ message: 'Erro ao atualizar usuário!' })
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errorsZodResponse = error.issues.map((issue) => {
+        return {
+          message: issue.message,
+          path: issue.path[0],
+        }
+      })
+
+      return response
+        .status(StatusCodeErrors.BAD_REQUEST)
+        .json(errorsZodResponse)
+    } else {
+      return response
+        .status(StatusCodeErrors.INTERNAL_SERVER_ERROR)
+        .json({ message: error })
+    }
   }
 }
