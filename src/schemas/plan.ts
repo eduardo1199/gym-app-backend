@@ -22,4 +22,21 @@ export const PlanSchema = z.object({
   }),
 })
 
-export type PlanSchemaType = z.infer<typeof PlanSchema>
+export const ParamsIdSchema = z.object({
+  id: z.string().uuid(),
+})
+
+export const PlanEditSchema = z.object({
+  name: z.string().optional(),
+  timeOfPlan: z
+    .number()
+    .max(360, {
+      message: 'Tempo do plano não pode ser superior a um ano!',
+    })
+
+    .positive({
+      message: 'Tempo do plano precisa ser maior que zero!',
+    })
+    .optional(),
+  price: z.number().optional(),
+})
