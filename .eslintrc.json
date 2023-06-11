@@ -1,6 +1,7 @@
 {
   "extends": ["@rocketseat/eslint-config/node"],
   "rules": {
-    "no-unused-vars": "off"
+    "no-unused-vars": "off",
+    "no-useless-constructor": "off"
   }
 }
