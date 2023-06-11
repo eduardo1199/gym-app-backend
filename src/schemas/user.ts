@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const UserSchema = z.object({
+export const registerUserSchema = z.object({
   name: z.string({
     required_error: 'Nome obrigatório!',
     invalid_type_error: 'Nome precisa ser um texto!',

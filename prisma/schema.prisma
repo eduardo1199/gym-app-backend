@@ -30,8 +30,8 @@ model Machine {
 
 model Plan {
   id         String  @id @default(uuid())
-  name       String
-  timeOfPlan Int
+  name       String  @unique
+  timeOfPlan Int     @unique
   price      Decimal
 
   users User[]
