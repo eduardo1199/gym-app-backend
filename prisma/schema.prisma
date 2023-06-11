@@ -40,11 +40,11 @@ model Plan {
 model User {
   id               String   @default(uuid())
   name             String
-  age              Decimal
-  weight           Decimal
+  age              Int
+  weight           Float
   cpf              String   @id
   registrationDate DateTime @default(now())
-  startDateForPlan DateTime
+  startDateForPlan DateTime @default(now())
   endDateforPlan   DateTime
 
   plan   Plan?   @relation(fields: [planId], references: [id])
