@@ -37,18 +37,24 @@ export class RegisterUseCase {
       throw new Error()
     }
 
-    const startForPlanDateFormat = data.startDateForPlan
-      ? new Date(data.startDateForPlan)
+    const startForPlanDateFormat = data?.startDateForPlan
+      ? new Date(data?.startDateForPlan)
       : new Date()
 
     const endForPlanDateFormat = add(startForPlanDateFormat, {
       days: plan.timeOfPlan,
     })
 
+    const { age, cpf, name, planId, weight } = data
+
     const newUserData = {
-      startDateForPlan: startForPlanDateFormat,
+      age,
+      cpf,
       endDateforPlan: endForPlanDateFormat,
-      ...data,
+      name,
+      planId,
+      weight,
+      startDateForPlan: startForPlanDateFormat,
     }
 
     const user = await this.userRepository.create(newUserData)

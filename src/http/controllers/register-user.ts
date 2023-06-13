@@ -36,7 +36,9 @@ export async function registerUser(request: Request, response: Response) {
 
       return response.status(404).json(errorsZodResponse)
     } else {
-      return response.status(500).json(error)
+      /*  console.log(error) */
+
+      return response.status(500).json()
     }
   }
 }

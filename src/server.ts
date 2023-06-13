@@ -2,54 +2,18 @@ import express from 'express'
 import cors from 'cors'
 
 import { createdAdmin, getAuthenticationAdmin, getAdmin } from './request/admin'
-import {
-  createdPlan,
-  getPlan,
-  getPlans,
-  deletePlan,
-  updatePlan,
-} from './request/plan'
-import {
-  createdUser,
-  deleteUser,
-  getAllUsers,
-  getUser,
-  updateUser,
-  authenticationUser,
-} from './request/users'
-import {
-  createdMachine,
-  deleteMachine,
-  getAllMachines,
-  updateMachine,
-} from './request/machine'
 import { env } from './env'
 
-const app = express()
+import { registerUser } from './http/controllers/register-user'
+import { getAllUsers } from './http/controllers/get-all-users'
+import { getUser } from './http/controllers/get-user'
+import { Routes } from './http/Routes'
 
-app.use(express.json())
-app.use(cors())
+const appExpress = express()
 
-app.post('/admin', createdAdmin)
-app.post('/admin/authentication', getAuthenticationAdmin)
-app.get('/admin/:id', getAdmin)
+appExpress.use(express.json())
+appExpress.use(cors())
 
-app.post('/plan', createdPlan)
-app.get('/plan/:id', getPlan)
-app.get('/plans', getPlans)
-app.put('/plan/:id', updatePlan)
-app.delete('/plan/:id', deletePlan)
-
-app.post('/user', createdUser)
-app.get('/users', getAllUsers)
-app.get('/user/:id', getUser)
-app.delete('/user/:id', deleteUser)
-app.put('/user/:id', updateUser)
-app.post('/user/authentication', authenticationUser)
-
-app.post('/machine', createdMachine)
-app.put('/machine/:id', updateMachine)
-app.delete('/machine/:id', deleteMachine)
-app.get('/machines', getAllMachines)
+const app = Routes(appExpress)
 
 app.listen(env.PORT)
