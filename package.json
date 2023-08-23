@@ -9,7 +9,11 @@
     "migrate": "prisma migrate dev --name",
     "lint": "eslint src --ext .ts --fix --report-unused-disable-directives --max-warnings 0",
     "studio": "prisma studio",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui"
   },
   "keywords": [],
   "author": "",
@@ -38,6 +42,6 @@
     "tsup": "^6.7.0",
     "typescript": "^5.0.0",
     "vite-tsconfig-paths": "^4.2.0",
-    "vitest": "^0.32.0"
+    "vitest": "^0.32.4"
   }
 }
