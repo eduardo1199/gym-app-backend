@@ -2,6 +2,7 @@ export enum StatusCodeErrors {
   SUCCESS = 200,
   CREATED = 201,
   ACCEPTED = 202,
+  UPDATE_SUCCESS = 204,
   BAD_REQUEST = 400,
   UNAUTHORIZED = 401,
   NOT_FOUND = 404,
