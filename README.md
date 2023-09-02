@@ -40,6 +40,15 @@ path: `src/http/Routes.ts`
 
 ### User Routes
 
+```tsx
+app.post('/user', registerUser)
+app.get('/users', getAllUsers)
+app.get('/user/:id', getUser)
+app.put('/user/:id', updateUser)
+app.delete('/user/:id', deleteUser)
+app.get('/user/:cpf', authenticateUser)
+```
+
 - Register New User
     - function controller registerUser from create new user
 - Get All Users
