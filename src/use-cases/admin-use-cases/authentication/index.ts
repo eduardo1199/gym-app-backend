@@ -5,7 +5,7 @@ interface AuthenticationAdminUseCaseProps {
   cpf: string
 }
 
-export default class AuthenticationAdminUseCase {
+export class AuthenticationAdminUseCase {
   constructor(private adminRepository: IAdminRepository) {}
 
   async execute(data: AuthenticationAdminUseCaseProps) {

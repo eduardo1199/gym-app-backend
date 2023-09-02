@@ -4,7 +4,7 @@ interface GetAdminUseCaseProps {
   id: string
 }
 
-export default class GetAdminUseCase {
+export class GetAdminUseCase {
   constructor(private adminRepository: IAdminRepository) {}
 
   async execute(data: GetAdminUseCaseProps) {

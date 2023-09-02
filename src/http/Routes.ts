@@ -6,6 +6,9 @@ import { getUser } from './controllers/get-user'
 import { updateUser } from './controllers/update-users'
 import { deleteUser } from './controllers/remove-users'
 import { authenticateUser } from './controllers/authentication-user'
+import { getAdmin } from './controllers/get-admin'
+import { registerAdmin } from './controllers/register-admin'
+import { authenticateAdmin } from './controllers/authentication-admin'
 
 export function Routes(app: Express) {
   /* User routes */
@@ -15,6 +18,12 @@ export function Routes(app: Express) {
   app.put('/user/:id', updateUser)
   app.delete('/user/:id', deleteUser)
   app.get('/user/:cpf', authenticateUser)
+
+  /* Admin routes */
+
+  app.get('/admin/:id', getAdmin)
+  app.post('/admin', registerAdmin)
+  app.post('/admin/authentication', authenticateAdmin)
 
   return app
 }
