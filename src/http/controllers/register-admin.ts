@@ -1,9 +1,7 @@
 import { Request, Response } from 'express'
-import { registerUserSchema } from '../../schemas/user'
 import { z } from 'zod'
 import { RegisterAdminUseCase } from '../../use-cases/admin-use-cases/register'
 import { PrismaAdminRepository } from '../../repositories/admin-repository/prisma-admin-repository'
-import { PrismaPlanRepository } from '../../repositories/plan-repository/prisma-plan-repository'
 import { AdminRegisterSchema } from '../../schemas/admin-register-schema'
 
 export async function registerAdmin(request: Request, response: Response) {

@@ -29,6 +29,7 @@
     "@commitlint/cli": "^17.6.5",
     "@commitlint/config-conventional": "^17.6.5",
     "@rocketseat/eslint-config": "^1.2.0",
+    "@types/bcryptjs": "^2.4.5",
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.14",
     "@vitest/coverage-v8": "^0.32.0",
