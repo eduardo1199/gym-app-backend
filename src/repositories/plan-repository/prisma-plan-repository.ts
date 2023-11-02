@@ -25,10 +25,14 @@ export class PrismaPlanRepository implements IPlanRepository {
     return plan
   }
 
-  async findByTimeOfPlan(time: number): Promise<Plan | null> {
-    const plan = await prisma.plan.findUnique({
+  async findBySomeNameAndTimeOfPlan(
+    timeOfPlan?: number,
+    name?: string,
+  ): Promise<Plan | null> {
+    const plan = await prisma.plan.findFirst({
       where: {
-        timeOfPlan: time,
+        timeOfPlan,
+        name,
       },
     })
 
