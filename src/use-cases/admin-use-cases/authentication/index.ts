@@ -1,3 +1,4 @@
+import { compare } from 'bcryptjs'
 import { IAdminRepository } from '../../../repositories/admin-repository/iadmin-repository'
 
 interface AuthenticationAdminUseCaseProps {
@@ -8,10 +9,8 @@ interface AuthenticationAdminUseCaseProps {
 export class AuthenticationAdminUseCase {
   constructor(private adminRepository: IAdminRepository) {}
 
-  async execute(data: AuthenticationAdminUseCaseProps) {
-    const adminResponse = await this.adminRepository.authenticationAdmin(
-      data.cpf,
-    )
+  async execute({ cpf, password }: AuthenticationAdminUseCaseProps) {
+    const adminResponse = await this.adminRepository.authenticationAdmin(cpf)
 
     if (!adminResponse) {
       throw new Error()
@@ -19,7 +18,9 @@ export class AuthenticationAdminUseCase {
 
     const { admin } = adminResponse
 
-    if (data.password !== admin.password) {
+    const isPasswordCorrectlyHash = await compare(password, admin.password)
+
+    if (isPasswordCorrectlyHash) {
       throw new Error()
     }
 
