@@ -35,6 +35,8 @@ model Plan {
   price      Decimal
 
   users User[]
+
+  @@unique([name, timeOfPlan])
 }
 
 model User {
