@@ -6,4 +6,5 @@ export interface IMachineRepository {
   updateMachine(data: Prisma.MachineUpdateInput, id: string): Promise<Machine>
   deleteMachine(id: string): Promise<void>
   findByMachine(id: string): Promise<Machine | null>
+  findBySomeMachineName: (name: string) => Promise<Machine | null>
 }

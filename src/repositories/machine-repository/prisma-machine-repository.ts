@@ -52,4 +52,18 @@ export class PrismaMachineRepository implements IMachineRepository {
 
     return machine
   }
+
+  async findBySomeMachineName(name: string): Promise<Machine | null> {
+    const machine = await prisma.machine.findUnique({
+      where: {
+        name,
+      },
+    })
+
+    if (!machine) {
+      return null
+    }
+
+    return machine
+  }
 }
