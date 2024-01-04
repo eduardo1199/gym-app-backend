@@ -23,7 +23,7 @@ model Admin {
 
 model Machine {
   id          String  @id @default(uuid())
-  name        String
+  name        String  @unique
   description String
   maintenance Boolean
 }
