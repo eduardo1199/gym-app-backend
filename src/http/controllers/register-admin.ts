@@ -3,6 +3,8 @@ import { z } from 'zod'
 import { RegisterAdminUseCase } from '../../use-cases/admin-use-cases/register'
 import { PrismaAdminRepository } from '../../repositories/admin-repository/prisma-admin-repository'
 import { AdminRegisterSchema } from '../../schemas/admin-register-schema'
+import jwt from 'jsonwebtoken'
+import { env } from '../../env'
 
 export async function registerAdmin(request: Request, response: Response) {
   try {
@@ -13,7 +15,7 @@ export async function registerAdmin(request: Request, response: Response) {
     const adminRepository = new PrismaAdminRepository()
     const registerAdminUseCase = new RegisterAdminUseCase(adminRepository)
 
-    await registerAdminUseCase.execute({
+    const { admin } = await registerAdminUseCase.execute({
       birthDate,
       cpf,
       name,
@@ -21,7 +23,17 @@ export async function registerAdmin(request: Request, response: Response) {
       year,
     })
 
-    return response.status(201).send('Administrador cadastrado com sucesso!')
+    const token: string = jwt.sign(
+      { id: admin.id, cpf: admin.cpf, name: admin.name },
+      env.SECRET,
+      {
+        expiresIn: 60 * 60 * 24, // 24 hours
+      },
+    )
+
+    return response.status(201).send({
+      token,
+    })
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errorsZodResponse = error.issues.map((issue) => {
