@@ -26,7 +26,7 @@ export function Routes(app: Express) {
   app.get('/user/:id', verifyJWT, getUser)
   app.put('/user/:id', verifyJWT, updateUser)
   app.delete('/user/:id', verifyJWT, deleteUser)
-  app.get('/user/:cpf', authenticateUser)
+  app.post('/user/authentication', authenticateUser)
 
   /* Admin routes */
 
