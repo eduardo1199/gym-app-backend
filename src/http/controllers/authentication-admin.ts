@@ -3,10 +3,12 @@ import { AuthenticationAdminUseCase } from '../../use-cases/admin-use-cases/auth
 import { PrismaAdminRepository } from '../../repositories/admin-repository/prisma-admin-repository'
 import { z } from 'zod'
 import { AdminAuthenticationSchema } from '../../schemas/admin-schema-authentication'
+import jwt from 'jsonwebtoken'
+import { env } from '../../env'
 
 export async function authenticateAdmin(request: Request, response: Response) {
   try {
-    const { cpf, password } = AdminAuthenticationSchema.parse(request.params)
+    const { cpf, password } = AdminAuthenticationSchema.parse(request.body)
 
     const adminRepository = new PrismaAdminRepository()
     const authenticationAdminUseCase = new AuthenticationAdminUseCase(
@@ -18,7 +20,13 @@ export async function authenticateAdmin(request: Request, response: Response) {
       password,
     })
 
-    return response.status(200).json({ admin })
+    const adminPayload = { id: admin.id, cpf: admin.cpf, name: admin.name }
+
+    const token: string = jwt.sign(adminPayload, env.SECRET, {
+      expiresIn: 60 * 60 * 24, // 24 hours
+    })
+
+    return response.status(200).json({ token })
   } catch (err) {
     if (err instanceof z.ZodError) {
       const errorsZodResponse = err.issues.map((issue) => {
