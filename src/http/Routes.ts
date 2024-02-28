@@ -12,25 +12,26 @@ import { authenticateAdmin } from './controllers/authentication-admin'
 import RegisterPlan from './controllers/register-plan'
 import GetPlan from './controllers/get-plan'
 import GetAllPlans from './controllers/get-all-plans'
+import { verifyJWT } from './middleware/verifyJWT'
 
 export function Routes(app: Express) {
   /** Plan routes */
-  app.post('/plan', RegisterPlan)
-  app.get('/plan/:id', GetPlan)
-  app.get('/plans', GetAllPlans)
+  app.post('/plan', verifyJWT, RegisterPlan)
+  app.get('/plan/:id', verifyJWT, GetPlan)
+  app.get('/plans', verifyJWT, GetAllPlans)
 
   /* User routes */
-  app.post('/user', registerUser)
-  app.get('/users', getAllUsers)
-  app.get('/user/:id', getUser)
-  app.put('/user/:id', updateUser)
-  app.delete('/user/:id', deleteUser)
-  app.get('/user/:cpf', authenticateUser)
+  app.post('/user', verifyJWT, registerUser)
+  app.get('/users', verifyJWT, getAllUsers)
+  app.get('/user/:id', verifyJWT, getUser)
+  app.put('/user/:id', verifyJWT, updateUser)
+  app.delete('/user/:id', verifyJWT, deleteUser)
+  app.post('/user/authentication', authenticateUser)
 
   /* Admin routes */
 
-  app.get('/admin/:id', getAdmin)
-  app.post('/admin', registerAdmin)
+  app.get('/admin/:id', verifyJWT, getAdmin)
+  app.post('/admin', verifyJWT, registerAdmin)
   app.post('/admin/authentication', authenticateAdmin)
 
   return app

@@ -6,7 +6,7 @@ import { z } from 'zod'
 
 export async function authenticateUser(request: Request, response: Response) {
   try {
-    const { cpf } = ParamsCPFRequestSchema.parse(request.params)
+    const { cpf } = ParamsCPFRequestSchema.parse(request.body)
 
     const userRepository = new PrismaUserRepository()
     const authenticationUserUseCase = new AuthenticationUser(userRepository)
