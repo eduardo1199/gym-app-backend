@@ -16,7 +16,10 @@ export async function verifyJWT(
     })
   }
 
-  jwt.verify(token, env.SECRET, (error, decoded) => {
+  const bearer = token.split(' ')
+  const bearerToken = bearer[1]
+
+  jwt.verify(bearerToken, env.SECRET, (error) => {
     if (error) {
       return res.status(500).send({
         message: 'Failed to authenticate token.',

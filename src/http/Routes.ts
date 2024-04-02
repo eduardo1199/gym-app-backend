@@ -16,17 +16,17 @@ import { verifyJWT } from './middleware/verifyJWT'
 
 export function Routes(app: Express) {
   /** Plan routes */
-  app.post('/plan', verifyJWT, RegisterPlan)
-  app.get('/plan/:id', verifyJWT, GetPlan)
+  app.post('/plans', verifyJWT, RegisterPlan)
+  app.get('/plans/:id', verifyJWT, GetPlan)
   app.get('/plans', verifyJWT, GetAllPlans)
 
   /* User routes */
-  app.post('/user', verifyJWT, registerUser)
+  app.post('/users', verifyJWT, registerUser)
   app.get('/users', verifyJWT, getAllUsers)
-  app.get('/user/:id', verifyJWT, getUser)
-  app.put('/user/:id', verifyJWT, updateUser)
-  app.delete('/user/:id', verifyJWT, deleteUser)
-  app.post('/user/authentication', authenticateUser)
+  app.get('/users/:id', getUser)
+  app.put('/users/:id', verifyJWT, updateUser)
+  app.delete('/users/:id', verifyJWT, deleteUser)
+  app.post('/users/authentication', authenticateUser)
 
   /* Admin routes */
 
