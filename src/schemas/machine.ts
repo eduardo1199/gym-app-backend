@@ -10,7 +10,7 @@ export const MachineRequestCreatedSchema = z.object({
       required_error: 'Descrição obrigatória!',
       invalid_type_error: 'Descrição precisa ser do tipo texto!',
     })
-    .max(100),
+    .max(200, 'Valor máximo de descrição são 200 caracteres.'),
   maintenance: z.boolean({
     required_error: 'É obrigatório indicar manutenção ou não do equipamento!',
     invalid_type_error: 'Precisa ser sim ou não!',
@@ -19,7 +19,7 @@ export const MachineRequestCreatedSchema = z.object({
 
 export const MachineRequestUpdateSchema = z.object({
   name: z.string().optional(),
-  description: z.string().max(100).optional(),
+  description: z.string().max(200).optional(),
   maintenance: z.boolean().optional(),
 })
 
