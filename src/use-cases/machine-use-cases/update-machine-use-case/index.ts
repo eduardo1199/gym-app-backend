@@ -2,9 +2,9 @@ import { Machine } from '@prisma/client'
 import { IMachineRepository } from '../../../repositories/machine-repository/imachine-repository'
 
 interface UpdateMachineUseCaseRequest {
-  name: string
-  description: string
-  maintenance: boolean
+  name?: string
+  description?: string
+  maintenance?: boolean
   id: string
 }
 

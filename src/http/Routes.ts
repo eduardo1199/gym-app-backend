@@ -13,6 +13,11 @@ import RegisterPlan from './controllers/register-plan'
 import GetPlan from './controllers/get-plan'
 import GetAllPlans from './controllers/get-all-plans'
 import { verifyJWT } from './middleware/verifyJWT'
+import { registerMachine } from './controllers/register-machine'
+import { updateMachine } from './controllers/update-machine'
+import { getMachine } from './controllers/get-machine'
+import { deleteMachine } from './controllers/delete-machine'
+import { getAllMachines } from './controllers/get-all-machines'
 
 export function Routes(app: Express) {
   /** Plan routes */
@@ -33,6 +38,13 @@ export function Routes(app: Express) {
   app.get('/admin/:id', verifyJWT, getAdmin)
   app.post('/admin', verifyJWT, registerAdmin)
   app.post('/admin/authentication', authenticateAdmin)
+
+  /* Machines routes */
+  app.post('/machine', verifyJWT, registerMachine)
+  app.put('/machine/:id', verifyJWT, updateMachine)
+  app.get('/machine/:id', verifyJWT, getMachine)
+  app.delete('/machine/:id', verifyJWT, deleteMachine)
+  app.get('/machines', verifyJWT, getAllMachines)
 
   return app
 }
