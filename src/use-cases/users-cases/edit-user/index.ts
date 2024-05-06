@@ -4,11 +4,11 @@ import { IPlanRepository } from '../../../repositories/plan-repository/iplan-rep
 import { add, subDays } from 'date-fns'
 
 interface EditUserUseCaseRequest {
-  age: number
-  cpf: string
-  name: string
-  planId: string
-  weight: number
+  age?: number
+  cpf?: string
+  name?: string
+  planId?: string
+  weight?: number
   startDateForPlan?: string
 }
 
@@ -21,7 +21,7 @@ export class EditUserUseCase {
   async execute(data: EditUserUseCaseRequest, userId: string) {
     const hasUserWithCpf = await this.userRepository.findByUserWithId(userId)
 
-    if (hasUserWithCpf) {
+    if (!hasUserWithCpf) {
       throw new Error()
     }
 
