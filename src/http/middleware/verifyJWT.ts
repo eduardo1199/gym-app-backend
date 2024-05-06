@@ -21,7 +21,7 @@ export async function verifyJWT(
 
   jwt.verify(bearerToken, env.SECRET, (error) => {
     if (error) {
-      return res.status(500).send({
+      return res.status(406).send({
         message: 'Failed to authenticate token.',
         auth: false,
       })
