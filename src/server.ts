@@ -3,13 +3,19 @@ import cors from 'cors'
 
 import { env } from './env'
 
-import { Routes } from './http/Routes'
+import { admin } from './http/admin-routes'
+import { machines } from './http/machines-routes'
+import { users } from './http/users-routes'
+import { plans } from './http/plans-routes'
 
-const appExpress = express()
+const app = express()
 
-appExpress.use(express.json())
-appExpress.use(cors())
+app.use(express.json())
+app.use(cors())
 
-const app = Routes(appExpress)
+app.use('/admin', admin)
+app.use('/machines', machines)
+app.use('/users', users)
+app.use('/plans', plans)
 
 app.listen(env.PORT)

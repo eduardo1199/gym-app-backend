@@ -27,7 +27,7 @@ export const ParamsIdSchema = z.object({
 })
 
 export const PlanEditSchema = z.object({
-  name: z.string().optional(),
+  name: z.string().optional().nullable(),
   timeOfPlan: z
     .number()
     .max(360, {
@@ -37,6 +37,6 @@ export const PlanEditSchema = z.object({
     .positive({
       message: 'Tempo do plano precisa ser maior que zero!',
     })
-    .optional(),
-  price: z.number().optional(),
+    .nullable(),
+  price: z.number().nullable(),
 })
