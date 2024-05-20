@@ -1,3 +1,4 @@
+import { NotFoundError } from '../../../err/not-found-error'
 import { IAdminRepository } from '../../../repositories/admin-repository/iadmin-repository'
 
 interface GetAdminUseCaseProps {
@@ -11,7 +12,7 @@ export class GetAdminUseCase {
     const admin = await this.adminRepository.getAdmin(data.id)
 
     if (!admin) {
-      throw new Error()
+      throw new NotFoundError('Admin')
     }
 
     return admin

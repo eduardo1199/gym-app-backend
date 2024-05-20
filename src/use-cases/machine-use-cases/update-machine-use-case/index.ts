@@ -1,5 +1,6 @@
 import { Machine } from '@prisma/client'
 import { IMachineRepository } from '../../../repositories/machine-repository/imachine-repository'
+import { NotFoundError } from '../../../err/not-found-error'
 
 interface UpdateMachineUseCaseRequest {
   name?: string
@@ -23,7 +24,7 @@ export class UpdateMachineUseCase {
     const getMachineById = await this.machineRepository.findByMachine(id)
 
     if (!getMachineById) {
-      throw new Error('Machine not exists!')
+      throw new NotFoundError('Machine')
     }
 
     const machine = await this.machineRepository.updateMachine(

@@ -1,3 +1,4 @@
+import { NotFoundError } from '../../../err/not-found-error'
 import { IMachineRepository } from '../../../repositories/machine-repository/imachine-repository'
 
 interface DeleteMachineUseCaseRequest {
@@ -13,7 +14,7 @@ export class DeleteMachineUseCase {
     const machine = await this.machineRepository.findByMachine(id)
 
     if (!machine) {
-      throw new Error('Machine not exists!')
+      throw new NotFoundError('Machine')
     }
 
     await this.machineRepository.deleteMachine(id)

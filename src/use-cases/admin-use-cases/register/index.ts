@@ -1,6 +1,7 @@
 import { Admin } from '@prisma/client'
 import { IAdminRepository } from '../../../repositories/admin-repository/iadmin-repository'
 import { hash } from 'bcryptjs'
+import { NotFoundError } from '../../../err/not-found-error'
 interface RegisterAdminUseCaseRequest {
   year: string
   cpf: string
@@ -26,7 +27,7 @@ export class RegisterAdminUseCase {
     const hasAdminWithCpf = await this.adminRepository.getAdminWithSomeCpf(cpf)
 
     if (hasAdminWithCpf) {
-      throw new Error()
+      throw new NotFoundError('Admin')
     }
 
     const password_hash = await hash(password, 6)

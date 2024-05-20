@@ -2,6 +2,7 @@ import { User } from '@prisma/client'
 import { IUserRepository } from '../../../repositories/user-repository/iuser-repository'
 import { IPlanRepository } from '../../../repositories/plan-repository/iplan-repository'
 import { add, subDays } from 'date-fns'
+import { NotFoundError } from '../../../err/not-found-error'
 
 interface EditUserUseCaseRequest {
   age?: number
@@ -22,7 +23,7 @@ export class EditUserUseCase {
     const hasUserWithCpf = await this.userRepository.findByUserWithId(userId)
 
     if (!hasUserWithCpf) {
-      throw new Error()
+      throw new NotFoundError('User')
     }
 
     let plan

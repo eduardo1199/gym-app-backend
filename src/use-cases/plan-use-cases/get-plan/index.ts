@@ -1,5 +1,6 @@
 import { Plan } from '@prisma/client'
 import { IPlanRepository } from '../../../repositories/plan-repository/iplan-repository'
+import { NotFoundError } from '../../../err/not-found-error'
 
 interface GetPlanUseCaseRequest {
   id: string
@@ -16,7 +17,7 @@ export class GetPlanUseCase {
     const plan = await this.planRepository.findById(data.id)
 
     if (!plan) {
-      throw new Error('Not exist plan!')
+      throw new NotFoundError('Plan')
     }
 
     return {

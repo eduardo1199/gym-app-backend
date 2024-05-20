@@ -1,3 +1,4 @@
+import { NotFoundError } from '../../../err/not-found-error'
 import { IPlanRepository } from '../../../repositories/plan-repository/iplan-repository'
 
 interface AmountUserWithPlanUseCaseRequest {
@@ -17,7 +18,7 @@ export class AmountUserWithPlanUseCase {
     const plan = await this.planRepository.findById(data.id)
 
     if (!plan) {
-      throw new Error('Not exist plan!')
+      throw new NotFoundError('Plan')
     }
 
     const amount = await this.planRepository.findByCountUsersWithPlan(data.id)

@@ -1,5 +1,6 @@
 import { Machine } from '@prisma/client'
 import { IMachineRepository } from '../../../repositories/machine-repository/imachine-repository'
+import { SameNameMachineError } from '../../../err/same-name-error-machine'
 
 interface CreateMachineUseCaseRequest {
   name: string
@@ -23,7 +24,7 @@ export class CreateMachineUseCase {
       await this.machineRepository.findBySomeMachineName(name)
 
     if (hasMachineWithName) {
-      throw new Error('Machine already exists!')
+      throw new SameNameMachineError()
     }
 
     const machine = await this.machineRepository.register({
