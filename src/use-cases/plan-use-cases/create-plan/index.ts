@@ -1,5 +1,6 @@
 import { Plan } from '@prisma/client'
 import { IPlanRepository } from '../../../repositories/plan-repository/iplan-repository'
+import { SameNameOrPeriodTimePlanError } from '../../../err/same-name-or-time-plan-error'
 
 interface CreatePlanUseCaseRequest {
   name: string
@@ -23,7 +24,7 @@ export class CreatePlanUseCase {
       await this.planRepository.findBySomeNameAndTimeOfPlan(timeOfPlan, name)
 
     if (hasPlanSomeNameOrTime) {
-      throw new Error('Plan already exists!')
+      throw new SameNameOrPeriodTimePlanError()
     }
 
     const plan = await this.planRepository.register({

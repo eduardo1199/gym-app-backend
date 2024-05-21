@@ -1,5 +1,6 @@
 import { Plan } from '@prisma/client'
 import { IPlanRepository } from '../../../repositories/plan-repository/iplan-repository'
+import { NotFoundError } from '../../../err/not-found-error'
 
 interface DeletePlanUseCaseRequest {
   id: string
@@ -12,7 +13,7 @@ export class DeletePlanUseCase {
     const plan = await this.planRepository.findById(data.id)
 
     if (!plan) {
-      throw new Error('Not exist plan!')
+      throw new NotFoundError('Plan')
     }
 
     await this.planRepository.delete(data.id)

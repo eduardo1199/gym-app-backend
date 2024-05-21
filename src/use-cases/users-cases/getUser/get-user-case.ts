@@ -2,6 +2,7 @@ import { User } from '@prisma/client'
 import { IUserRepository } from '../../../repositories/user-repository/iuser-repository'
 import { compareAsc, formatDistance } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { NotFoundError } from '../../../err/not-found-error'
 
 interface GetUserCaseRequest {
   id: string
@@ -19,7 +20,7 @@ export class GetUserCase {
     const user = await this.userRepository.findByUserWithId(data.id)
 
     if (!user) {
-      throw new Error()
+      throw new NotFoundError('User')
     }
 
     const isActive = compareAsc(user.endDateforPlan, user.startDateForPlan)

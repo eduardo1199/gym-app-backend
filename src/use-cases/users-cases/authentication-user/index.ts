@@ -1,3 +1,4 @@
+import { NotFoundError } from '../../../err/not-found-error'
 import { IUserRepository } from '../../../repositories/user-repository/iuser-repository'
 
 export class AuthenticationUser {
@@ -7,7 +8,7 @@ export class AuthenticationUser {
     const user = await this.userRepository.findByUserWithCpf(cpf)
 
     if (!user) {
-      throw new Error()
+      throw new NotFoundError('User')
     }
 
     return user

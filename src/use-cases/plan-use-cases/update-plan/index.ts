@@ -1,5 +1,7 @@
 import { Plan } from '@prisma/client'
 import { IPlanRepository } from '../../../repositories/plan-repository/iplan-repository'
+import { NotFoundError } from '../../../err/not-found-error'
+import { SameNameOrPeriodTimePlanError } from '../../../err/same-name-or-time-plan-error'
 
 interface UpdatePlanUseCaseRequest {
   name?: string
@@ -23,14 +25,14 @@ export class UpdatePlanUseCase {
     const hasPlanById = await this.planRepository.findById(data.id)
 
     if (!hasPlanById) {
-      throw new Error('Not exist plan!')
+      throw new NotFoundError('Plan')
     }
 
     const hasPlanSomeNameOrTime =
       await this.planRepository.findBySomeNameAndTimeOfPlan(timeOfPlan, name)
 
     if (hasPlanSomeNameOrTime) {
-      throw new Error('Plan already exists!')
+      throw new SameNameOrPeriodTimePlanError()
     }
 
     const plan = await this.planRepository.update(
