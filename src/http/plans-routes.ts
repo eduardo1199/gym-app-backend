@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Errback, NextFunction, Request, Response } from 'express'
 import { verifyJWT } from './middleware/verifyJWT'
 import GetAllPlans from './controllers/get-all-plans'
 import GetPlan from './controllers/get-plan'

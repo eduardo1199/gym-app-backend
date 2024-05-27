@@ -11,12 +11,12 @@ datasource db {
 }
 
 model Admin {
-  id        String @default(uuid())
-  name      String
-  year      String
-  cpf       String @id
-  password  String
-  birthDate String
+  id         String @default(uuid())
+  name       String
+  year       String
+  cpf        String @id
+  password   String
+  birth_date String
 
   @@unique([id])
 }
@@ -29,28 +29,28 @@ model Machine {
 }
 
 model Plan {
-  id         String  @id @default(uuid())
-  name       String  @unique
-  timeOfPlan Int     @unique
-  price      Decimal
+  id              String  @id @default(uuid())
+  name            String  @unique
+  plan_month_time Int     @unique
+  price           Decimal
 
   users User[]
 
-  @@unique([name, timeOfPlan])
+  @@unique([name, plan_month_time])
 }
 
 model User {
-  id               String   @default(uuid())
+  id               String   @id @default(uuid())
   name             String
   age              Int
   weight           Float
-  cpf              String   @id
-  registrationDate DateTime @default(now())
-  startDateForPlan DateTime @default(now())
-  endDateforPlan   DateTime
+  cpf              String   @unique
+  create_at        DateTime @default(now())
+  start_plan_date  DateTime @default(now())
+  finish_plan_date DateTime
 
   plan   Plan?   @relation(fields: [planId], references: [id])
   planId String?
 
-  @@unique([id])
+  @@unique([id, cpf])
 }

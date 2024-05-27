@@ -1,3 +1,4 @@
+import { NotFoundError } from '../../../err/not-found-error'
 import { IUserRepository } from '../../../repositories/user-repository/iuser-repository'
 
 export class RemoveUserUseCase {
@@ -7,7 +8,7 @@ export class RemoveUserUseCase {
     const user = await this.userRepository.findByUserWithId(id)
 
     if (!user) {
-      throw new Error()
+      throw new NotFoundError('User')
     }
 
     await this.userRepository.deleteUser(id)

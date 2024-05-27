@@ -2,6 +2,8 @@ import { User } from '@prisma/client'
 import { IUserRepository } from '../../../repositories/user-repository/iuser-repository'
 import { IPlanRepository } from '../../../repositories/plan-repository/iplan-repository'
 import { add } from 'date-fns'
+import { NotFoundError } from '../../../err/not-found-error'
+import { SameCpfError } from '../../../err/same-cof-error'
 
 interface RegisterUseCaseRequest {
   age: number
@@ -9,7 +11,7 @@ interface RegisterUseCaseRequest {
   name: string
   planId: string
   weight: number
-  startDateForPlan?: string
+  start_plan_date: string
 }
 
 interface RegisterUseCaseResponse {
@@ -23,38 +25,38 @@ export class RegisterUseCase {
   ) {}
 
   async execute(
-    data: RegisterUseCaseRequest,
+    userParams: RegisterUseCaseRequest,
   ): Promise<RegisterUseCaseResponse> {
-    const hasUserWithCpf = await this.userRepository.findByUserWithCpf(data.cpf)
+    const hasUserWithCpf = await this.userRepository.findByUserWithCpf(
+      userParams.cpf,
+    )
 
     if (hasUserWithCpf) {
-      throw new Error()
+      throw new SameCpfError()
     }
 
-    const plan = await this.planRepository.findById(data.planId)
+    const plan = await this.planRepository.findById(userParams.planId)
 
     if (!plan) {
-      throw new Error()
+      throw new NotFoundError('Plan')
     }
 
-    const startForPlanDateFormat = data?.startDateForPlan
-      ? new Date(data?.startDateForPlan)
-      : new Date()
+    const startForPlanDateFormat = new Date(userParams.start_plan_date)
 
     const endForPlanDateFormat = add(startForPlanDateFormat, {
-      days: plan.timeOfPlan,
+      days: plan.plan_month_time,
     })
 
-    const { age, cpf, name, planId, weight } = data
+    const { age, cpf, name, planId, weight } = userParams
 
     const newUserData = {
       age,
       cpf,
-      endDateforPlan: endForPlanDateFormat,
+      finish_plan_date: endForPlanDateFormat,
       name,
       planId,
       weight,
-      startDateForPlan: startForPlanDateFormat,
+      start_plan_date: startForPlanDateFormat,
     }
 
     const user = await this.userRepository.create(newUserData)
