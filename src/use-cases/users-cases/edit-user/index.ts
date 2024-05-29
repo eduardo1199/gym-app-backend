@@ -13,6 +13,10 @@ interface EditUserUseCaseRequest {
   startDateForPlan?: string
 }
 
+interface EditUserUseCaseResponse {
+  user: User
+}
+
 export class EditUserUseCase {
   constructor(
     private userRepository: IUserRepository,
@@ -26,42 +30,10 @@ export class EditUserUseCase {
       throw new NotFoundError('User')
     }
 
-    let plan
-    let endDateforPlan
+    const user = await this.userRepository.updateUser(data, userId)
 
-    const currentDate = new Date()
-    const { age, cpf, name, planId, weight, startDateForPlan } = data
-
-    if (data.planId) {
-      plan = await this.planRepository.findById(data.planId)
-
-      if (startDateForPlan) {
-        endDateforPlan = add(new Date(startDateForPlan), {
-          days: plan?.timeOfPlan ?? 0,
-        })
-      } else {
-        endDateforPlan = add(currentDate, {
-          days: plan?.timeOfPlan ?? 0,
-        })
-      }
-
-      if (!plan) {
-        endDateforPlan = subDays(currentDate, 1)
-      }
+    return {
+      user,
     }
-
-    const newUserData = {
-      age,
-      cpf,
-      endDateforPlan,
-      name,
-      planId,
-      weight,
-      startDateForPlan,
-    }
-
-    const user = await this.userRepository.updateUser(newUserData, userId)
-
-    return user
   }
 }

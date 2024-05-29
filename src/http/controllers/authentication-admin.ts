@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { AdminAuthenticationSchema } from '../../schemas/admin-schema-authentication'
 import jwt from 'jsonwebtoken'
 import { env } from '../../env'
+import { NotMatchPasswordOrCPF } from '../../err/not-match-authentication'
 
 export async function authenticateAdmin(request: Request, response: Response) {
   try {
@@ -27,20 +28,13 @@ export async function authenticateAdmin(request: Request, response: Response) {
     })
 
     return response.status(200).json({ token })
-  } catch (err) {
-    if (err instanceof z.ZodError) {
-      const errorsZodResponse = err.issues.map((issue) => {
-        return {
-          message: issue.message,
-          path: issue.path[0],
-        }
+  } catch (error) {
+    if (error instanceof NotMatchPasswordOrCPF) {
+      return response.status(409).json({
+        message: error.message,
       })
-
-      return response.status(404).json(errorsZodResponse)
-    } else {
-      /*  console.log(error) */
-
-      return response.status(500).json()
     }
+
+    throw error
   }
 }

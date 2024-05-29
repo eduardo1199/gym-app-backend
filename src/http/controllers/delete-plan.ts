@@ -3,6 +3,7 @@ import { PrismaPlanRepository } from '../../repositories/plan-repository/prisma-
 import { ParamsIdRequestSchema } from '../../schemas/params-request-id'
 import { DeletePlanUseCase } from '../../use-cases/plan-use-cases/delete-plan'
 import { Request, Response } from 'express'
+import { NotFoundError } from '../../err/not-found-error'
 
 export async function deletePlanController(
   request: Request,
@@ -20,17 +21,12 @@ export async function deletePlanController(
 
     return response.status(204).send('Plano removido com sucesso!')
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errorsZodResponse = error.issues.map((issue) => {
-        return {
-          message: issue.message,
-          path: issue.path[0],
-        }
+    if (error instanceof NotFoundError) {
+      return response.status(409).json({
+        message: error.message,
       })
-
-      return response.status(404).json(errorsZodResponse)
-    } else {
-      return response.status(500).json(error)
     }
+
+    throw error
   }
 }

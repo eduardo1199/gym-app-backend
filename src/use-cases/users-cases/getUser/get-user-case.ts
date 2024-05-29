@@ -1,16 +1,13 @@
 import { User } from '@prisma/client'
 import { IUserRepository } from '../../../repositories/user-repository/iuser-repository'
-import { compareAsc, formatDistance } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 import { NotFoundError } from '../../../err/not-found-error'
 
 interface GetUserCaseRequest {
   id: string
 }
 
-interface GetUserCaseResponse extends User {
-  isActive: boolean
-  timeFinishPlan: string
+interface GetUserCaseResponse {
+  user: User
 }
 
 export class GetUserCase {
@@ -23,20 +20,8 @@ export class GetUserCase {
       throw new NotFoundError('User')
     }
 
-    const isActive = compareAsc(user.endDateforPlan, user.startDateForPlan)
-
-    const userResponse = {
-      ...user,
-      isActive: isActive !== -1,
-      timeFinishPlan: formatDistance(
-        user.startDateForPlan,
-        user.endDateforPlan,
-        {
-          locale: ptBR,
-        },
-      ),
+    return {
+      user,
     }
-
-    return userResponse
   }
 }

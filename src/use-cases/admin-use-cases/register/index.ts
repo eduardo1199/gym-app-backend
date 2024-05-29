@@ -6,7 +6,7 @@ interface RegisterAdminUseCaseRequest {
   year: string
   cpf: string
   name: string
-  birthDate: string
+  birth_date: string
   password: string
 }
 
@@ -18,7 +18,7 @@ export class RegisterAdminUseCase {
   constructor(private adminRepository: IAdminRepository) {}
 
   async execute({
-    birthDate,
+    birth_date,
     cpf,
     name,
     password,
@@ -33,7 +33,7 @@ export class RegisterAdminUseCase {
     const password_hash = await hash(password, 6)
 
     const admin = await this.adminRepository.create({
-      birthDate,
+      birth_date,
       cpf,
       name,
       password: password_hash,

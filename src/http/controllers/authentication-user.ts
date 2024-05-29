@@ -3,6 +3,7 @@ import { ParamsCPFRequestSchema } from '../../schemas/params-request-cpf'
 import { AuthenticationUser } from '../../use-cases/users-cases/authentication-user'
 import { PrismaUserRepository } from '../../repositories/user-repository/prisma-user-repository'
 import { z } from 'zod'
+import { NotFoundError } from '../../err/not-found-error'
 
 export async function authenticateUser(request: Request, response: Response) {
   try {
@@ -14,20 +15,13 @@ export async function authenticateUser(request: Request, response: Response) {
     const user = await authenticationUserUseCase.execute(cpf)
 
     return response.status(200).json({ user })
-  } catch (err) {
-    if (err instanceof z.ZodError) {
-      const errorsZodResponse = err.issues.map((issue) => {
-        return {
-          message: issue.message,
-          path: issue.path[0],
-        }
+  } catch (error) {
+    if (error instanceof NotFoundError) {
+      return response.status(409).json({
+        message: error.message,
       })
-
-      return response.status(404).json(errorsZodResponse)
-    } else {
-      /*  console.log(error) */
-
-      return response.status(500).json()
     }
+
+    throw error
   }
 }

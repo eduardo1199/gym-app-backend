@@ -4,7 +4,7 @@ import { SameNameOrPeriodTimePlanError } from '../../../err/same-name-or-time-pl
 
 interface CreatePlanUseCaseRequest {
   name: string
-  timeOfPlan: number
+  plan_month_time: number
   price: number
 }
 
@@ -18,10 +18,13 @@ export class CreatePlanUseCase {
   async execute(
     data: CreatePlanUseCaseRequest,
   ): Promise<CreatePlanUseCaseResponse> {
-    const { name, timeOfPlan, price } = data
+    const { name, plan_month_time, price } = data
 
     const hasPlanSomeNameOrTime =
-      await this.planRepository.findBySomeNameAndTimeOfPlan(timeOfPlan, name)
+      await this.planRepository.findBySomeNameAndTimeOfPlan(
+        plan_month_time,
+        name,
+      )
 
     if (hasPlanSomeNameOrTime) {
       throw new SameNameOrPeriodTimePlanError()
@@ -30,7 +33,7 @@ export class CreatePlanUseCase {
     const plan = await this.planRepository.register({
       name,
       price,
-      timeOfPlan,
+      plan_month_time,
     })
 
     return {
