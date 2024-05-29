@@ -8,14 +8,14 @@ import { env } from '../../env'
 import { NotMatchPasswordOrCPF } from '../../err/not-match-authentication'
 
 export async function authenticateAdmin(request: Request, response: Response) {
-  const { cpf, password } = AdminAuthenticationSchema.parse(request.body)
-
-  const adminRepository = new PrismaAdminRepository()
-  const authenticationAdminUseCase = new AuthenticationAdminUseCase(
-    adminRepository,
-  )
-
   try {
+    const { cpf, password } = AdminAuthenticationSchema.parse(request.body)
+
+    const adminRepository = new PrismaAdminRepository()
+    const authenticationAdminUseCase = new AuthenticationAdminUseCase(
+      adminRepository,
+    )
+
     const { admin } = await authenticationAdminUseCase.execute({
       cpf,
       password,
@@ -30,7 +30,9 @@ export async function authenticateAdmin(request: Request, response: Response) {
     return response.status(200).json({ token })
   } catch (error) {
     if (error instanceof NotMatchPasswordOrCPF) {
-      return response.status(409).json(error.message)
+      return response.status(409).json({
+        message: error.message,
+      })
     }
 
     throw error
