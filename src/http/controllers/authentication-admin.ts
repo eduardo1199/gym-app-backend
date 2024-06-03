@@ -6,8 +6,13 @@ import { AdminAuthenticationSchema } from '../../schemas/admin-schema-authentica
 import jwt from 'jsonwebtoken'
 import { env } from '../../env'
 import { NotMatchPasswordOrCPF } from '../../err/not-match-authentication'
+import { NotFoundError } from '../../err/not-found-error'
 
-export async function authenticateAdmin(request: Request, response: Response) {
+export async function authenticateAdmin(
+  request: Request,
+  response: Response,
+  next: any,
+) {
   try {
     const { cpf, password } = AdminAuthenticationSchema.parse(request.body)
 
@@ -29,12 +34,15 @@ export async function authenticateAdmin(request: Request, response: Response) {
 
     return response.status(200).json({ token })
   } catch (error) {
-    if (error instanceof NotMatchPasswordOrCPF) {
+    if (
+      error instanceof NotMatchPasswordOrCPF ||
+      error instanceof NotFoundError
+    ) {
       return response.status(409).json({
         message: error.message,
       })
     }
 
-    throw error
+    next(error)
   }
 }

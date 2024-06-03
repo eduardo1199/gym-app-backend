@@ -7,7 +7,11 @@ import { PrismaPlanRepository } from '../../repositories/plan-repository/prisma-
 import { SameCpfError } from '../../err/same-cof-error'
 import { NotFoundError } from '../../err/not-found-error'
 
-export async function registerUser(request: Request, response: Response) {
+export async function registerUser(
+  request: Request,
+  response: Response,
+  next: any,
+) {
   try {
     const { age, cpf, name, planId, weight, start_plan_date } =
       registerUserSchema.parse(request.body)
@@ -34,6 +38,6 @@ export async function registerUser(request: Request, response: Response) {
       })
     }
 
-    throw error
+    next(error)
   }
 }

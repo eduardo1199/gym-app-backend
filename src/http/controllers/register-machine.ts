@@ -5,7 +5,11 @@ import { CreateMachineUseCase } from '../../use-cases/machine-use-cases/create-m
 import { PrismaMachineRepository } from '../../repositories/machine-repository/prisma-machine-repository'
 import { SameNameMachineError } from '../../err/same-name-error-machine'
 
-export async function registerMachine(request: Request, response: Response) {
+export async function registerMachine(
+  request: Request,
+  response: Response,
+  next: any,
+) {
   try {
     const { description, maintenance, name } =
       MachineRequestCreatedSchema.parse(request.body)
@@ -28,6 +32,6 @@ export async function registerMachine(request: Request, response: Response) {
       })
     }
 
-    throw error
+    next(error)
   }
 }

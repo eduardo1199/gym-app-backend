@@ -8,7 +8,11 @@ import { ParamsIdRequestSchema } from '../../schemas/params-request-id'
 import { StatusCodeErrors } from '../../err/status.code-errors'
 import { NotFoundError } from '../../err/not-found-error'
 
-export async function updateUser(request: Request, response: Response) {
+export async function updateUser(
+  request: Request,
+  response: Response,
+  next: any,
+) {
   try {
     const { id } = ParamsIdRequestSchema.parse(request.params)
 
@@ -42,6 +46,6 @@ export async function updateUser(request: Request, response: Response) {
       })
     }
 
-    throw error
+    next(error)
   }
 }

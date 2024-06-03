@@ -8,6 +8,7 @@ import { NotFoundError } from '../../err/not-found-error'
 export async function deletePlanController(
   request: Request,
   response: Response,
+  next: any,
 ) {
   try {
     const { id } = ParamsIdRequestSchema.parse(request.params)
@@ -27,6 +28,6 @@ export async function deletePlanController(
       })
     }
 
-    throw error
+    next(error)
   }
 }

@@ -7,7 +7,11 @@ import jwt from 'jsonwebtoken'
 import { env } from '../../env'
 import { NotFoundError } from '../../err/not-found-error'
 
-export async function registerAdmin(request: Request, response: Response) {
+export async function registerAdmin(
+  request: Request,
+  response: Response,
+  next: any,
+) {
   try {
     const { cpf, name, birth_date, password, year } = AdminRegisterSchema.parse(
       request.body,
@@ -42,6 +46,6 @@ export async function registerAdmin(request: Request, response: Response) {
       })
     }
 
-    throw error
+    next(error)
   }
 }

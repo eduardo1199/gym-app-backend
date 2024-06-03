@@ -8,6 +8,7 @@ import { SameNameOrPeriodTimePlanError } from '../../err/same-name-or-time-plan-
 export default async function RegisterPlan(
   request: Request,
   response: Response,
+  next: any,
 ) {
   try {
     const { name, price, plan_month_time } = PlanSchema.parse(request.body)
@@ -30,6 +31,6 @@ export default async function RegisterPlan(
       })
     }
 
-    throw error
+    next(error)
   }
 }

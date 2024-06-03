@@ -10,6 +10,7 @@ import { SameNameOrPeriodTimePlanError } from '../../err/same-name-or-time-plan-
 export async function updatePlanController(
   request: Request,
   response: Response,
+  next: any,
 ) {
   try {
     const { id } = ParamsIdRequestSchema.parse(request.params)
@@ -37,6 +38,6 @@ export async function updatePlanController(
       })
     }
 
-    throw error
+    next(error)
   }
 }

@@ -5,7 +5,11 @@ import { ParamsIdRequestSchema } from '../../schemas/params-request-id'
 import { GetPlanUseCase } from '../../use-cases/plan-use-cases/get-plan'
 import { NotFoundError } from '../../err/not-found-error'
 
-export default async function GetPlan(request: Request, response: Response) {
+export default async function GetPlan(
+  request: Request,
+  response: Response,
+  next: any,
+) {
   try {
     const { id } = ParamsIdRequestSchema.parse(request.params)
 
@@ -27,6 +31,6 @@ export default async function GetPlan(request: Request, response: Response) {
       })
     }
 
-    throw error
+    next(error)
   }
 }

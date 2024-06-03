@@ -5,7 +5,7 @@ import { GetUserCase } from '../../use-cases/users-cases/getUser/get-user-case'
 import { z } from 'zod'
 import { NotFoundError } from '../../err/not-found-error'
 
-export async function getUser(request: Request, response: Response) {
+export async function getUser(request: Request, response: Response, next: any) {
   try {
     const { id } = ParamsIdRequestSchema.parse(request.params)
 
@@ -24,6 +24,6 @@ export async function getUser(request: Request, response: Response) {
       })
     }
 
-    throw error
+    next(error)
   }
 }

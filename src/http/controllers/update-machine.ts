@@ -8,7 +8,11 @@ import { UpdateMachineUseCase } from '../../use-cases/machine-use-cases/update-m
 import { PrismaMachineRepository } from '../../repositories/machine-repository/prisma-machine-repository'
 import { NotFoundError } from '../../err/not-found-error'
 
-export async function updateMachine(request: Request, response: Response) {
+export async function updateMachine(
+  request: Request,
+  response: Response,
+  next: any,
+) {
   try {
     const { description, maintenance, name } = MachineRequestUpdateSchema.parse(
       request.body,
@@ -35,6 +39,6 @@ export async function updateMachine(request: Request, response: Response) {
       })
     }
 
-    throw error
+    next(error)
   }
 }

@@ -5,7 +5,11 @@ import { GetAdminUseCase } from '../../use-cases/admin-use-cases/get-admin'
 import { z } from 'zod'
 import { NotFoundError } from '../../err/not-found-error'
 
-export async function getAdmin(request: Request, response: Response) {
+export async function getAdmin(
+  request: Request,
+  response: Response,
+  next: any,
+) {
   try {
     const { id } = ParamsIdRequestSchema.parse(request.params)
 
@@ -24,6 +28,6 @@ export async function getAdmin(request: Request, response: Response) {
       })
     }
 
-    throw error
+    next(error)
   }
 }

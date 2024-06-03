@@ -5,7 +5,11 @@ import { PrismaUserRepository } from '../../repositories/user-repository/prisma-
 import { z } from 'zod'
 import { NotFoundError } from '../../err/not-found-error'
 
-export async function authenticateUser(request: Request, response: Response) {
+export async function authenticateUser(
+  request: Request,
+  response: Response,
+  next: any,
+) {
   try {
     const { cpf } = ParamsCPFRequestSchema.parse(request.body)
 
@@ -22,6 +26,6 @@ export async function authenticateUser(request: Request, response: Response) {
       })
     }
 
-    throw error
+    next(error)
   }
 }

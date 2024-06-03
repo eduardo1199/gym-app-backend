@@ -8,7 +8,11 @@ import { GetMachineUseCase } from '../../use-cases/machine-use-cases/get-machine
 import { PrismaMachineRepository } from '../../repositories/machine-repository/prisma-machine-repository'
 import { NotFoundError } from '../../err/not-found-error'
 
-export async function getMachine(request: Request, response: Response) {
+export async function getMachine(
+  request: Request,
+  response: Response,
+  next: any,
+) {
   try {
     const { id } = MachineIdSchema.parse(request.params)
 
@@ -30,6 +34,6 @@ export async function getMachine(request: Request, response: Response) {
       })
     }
 
-    throw error
+    next(error)
   }
 }

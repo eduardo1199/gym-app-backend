@@ -1,6 +1,7 @@
 import { compare } from 'bcryptjs'
 import { IAdminRepository } from '../../../repositories/admin-repository/iadmin-repository'
 import { NotMatchPasswordOrCPF } from '../../../err/not-match-authentication'
+import { NotFoundError } from '../../../err/not-found-error'
 
 interface AuthenticationAdminUseCaseProps {
   password: string
@@ -14,14 +15,14 @@ export class AuthenticationAdminUseCase {
     const adminResponse = await this.adminRepository.authenticationAdmin(cpf)
 
     if (!adminResponse) {
-      throw new NotMatchPasswordOrCPF()
+      throw new NotFoundError('Admin')
     }
 
     const { admin } = adminResponse
 
-    const isPasswordCorrectlyHash = await compare(password, admin.password)
+    const isPasswordMath = await compare(password, admin.password)
 
-    if (isPasswordCorrectlyHash) {
+    if (!isPasswordMath) {
       throw new NotMatchPasswordOrCPF()
     }
 
