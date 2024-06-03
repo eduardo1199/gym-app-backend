@@ -5,6 +5,7 @@ import { PrismaAdminRepository } from '../../repositories/admin-repository/prism
 import { AdminRegisterSchema } from '../../schemas/admin-register-schema'
 import jwt from 'jsonwebtoken'
 import { env } from '../../env'
+import { NotFoundError } from '../../err/not-found-error'
 
 export async function registerAdmin(request: Request, response: Response) {
   try {
@@ -35,19 +36,12 @@ export async function registerAdmin(request: Request, response: Response) {
       token,
     })
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errorsZodResponse = error.issues.map((issue) => {
-        return {
-          message: issue.message,
-          path: issue.path[0],
-        }
+    if (error instanceof NotFoundError) {
+      return response.status(409).json({
+        message: error.message,
       })
-
-      return response.status(404).json(errorsZodResponse)
-    } else {
-      console.log(error)
-
-      return response.status(500).json()
     }
+
+    throw error
   }
 }

@@ -3,6 +3,7 @@ import { ParamsIdRequestSchema } from '../../schemas/user'
 import { PrismaUserRepository } from '../../repositories/user-repository/prisma-user-repository'
 import { GetUserCase } from '../../use-cases/users-cases/getUser/get-user-case'
 import { z } from 'zod'
+import { NotFoundError } from '../../err/not-found-error'
 
 export async function getUser(request: Request, response: Response) {
   try {
@@ -17,17 +18,12 @@ export async function getUser(request: Request, response: Response) {
       user,
     })
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errorsZodResponse = error.issues.map((issue) => {
-        return {
-          message: issue.message,
-          path: issue.path[0],
-        }
+    if (error instanceof NotFoundError) {
+      return response.status(409).json({
+        message: error.message,
       })
-
-      return response.status(404).json(errorsZodResponse)
-    } else {
-      return response.status(500).json(error)
     }
+
+    throw error
   }
 }

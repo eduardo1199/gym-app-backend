@@ -6,6 +6,7 @@ import { PrismaUserRepository } from '../../repositories/user-repository/prisma-
 import { PrismaPlanRepository } from '../../repositories/plan-repository/prisma-plan-repository'
 import { ParamsIdRequestSchema } from '../../schemas/params-request-id'
 import { StatusCodeErrors } from '../../err/status.code-errors'
+import { NotFoundError } from '../../err/not-found-error'
 
 export async function updateUser(request: Request, response: Response) {
   try {
@@ -35,19 +36,12 @@ export async function updateUser(request: Request, response: Response) {
       .status(StatusCodeErrors.UPDATE_SUCCESS)
       .send('Aluno atulizado com sucesso!')
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errorsZodResponse = error.issues.map((issue) => {
-        return {
-          message: issue.message,
-          path: issue.path[0],
-        }
+    if (error instanceof NotFoundError) {
+      return response.status(409).json({
+        message: error.message,
       })
-
-      return response.status(404).json(errorsZodResponse)
-    } else {
-      /*  console.log(error) */
-
-      return response.status(500).json()
     }
+
+    throw error
   }
 }
