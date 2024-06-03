@@ -8,7 +8,11 @@ import { DeleteMachineUseCase } from '../../use-cases/machine-use-cases/delete-m
 import { PrismaMachineRepository } from '../../repositories/machine-repository/prisma-machine-repository'
 import { NotFoundError } from '../../err/not-found-error'
 
-export async function deleteMachine(request: Request, response: Response) {
+export async function deleteMachine(
+  request: Request,
+  response: Response,
+  next: any,
+) {
   try {
     const { id } = MachineIdSchema.parse(request.params)
 
@@ -28,6 +32,6 @@ export async function deleteMachine(request: Request, response: Response) {
       })
     }
 
-    throw error
+    next(error)
   }
 }

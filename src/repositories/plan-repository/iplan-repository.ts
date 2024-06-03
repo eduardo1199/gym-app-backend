@@ -4,7 +4,7 @@ export interface IPlanRepository {
   register(data: Prisma.PlanCreateInput): Promise<Plan>
   findByName(name: string): Promise<Plan | null>
   findBySomeNameAndTimeOfPlan(
-    timeOfPlan?: number,
+    plan_month_time?: number,
     name?: string,
   ): Promise<Plan | null>
   findById(id: string): Promise<Plan | null>

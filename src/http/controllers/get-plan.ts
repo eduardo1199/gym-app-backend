@@ -3,8 +3,13 @@ import { PrismaPlanRepository } from '../../repositories/plan-repository/prisma-
 import { z } from 'zod'
 import { ParamsIdRequestSchema } from '../../schemas/params-request-id'
 import { GetPlanUseCase } from '../../use-cases/plan-use-cases/get-plan'
+import { NotFoundError } from '../../err/not-found-error'
 
-export default async function GetPlan(request: Request, response: Response) {
+export default async function GetPlan(
+  request: Request,
+  response: Response,
+  next: any,
+) {
   try {
     const { id } = ParamsIdRequestSchema.parse(request.params)
 
@@ -20,18 +25,12 @@ export default async function GetPlan(request: Request, response: Response) {
       plan,
     })
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errorsZodResponse = error.issues.map((issue) => {
-        return {
-          message: issue.message,
-          path: issue.path[0],
-        }
+    if (error instanceof NotFoundError) {
+      return response.status(409).json({
+        message: error.message,
       })
-
-      return response.status(404).json(errorsZodResponse)
-    } else {
-      console.error(error)
-      return response.status(500).send('Error interno do servido!')
     }
+
+    next(error)
   }
 }

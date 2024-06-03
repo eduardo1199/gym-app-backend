@@ -3,8 +3,13 @@ import { MachineRequestCreatedSchema } from '../../schemas/machine'
 import { z } from 'zod'
 import { CreateMachineUseCase } from '../../use-cases/machine-use-cases/create-machine-use-case'
 import { PrismaMachineRepository } from '../../repositories/machine-repository/prisma-machine-repository'
+import { SameNameMachineError } from '../../err/same-name-error-machine'
 
-export async function registerMachine(request: Request, response: Response) {
+export async function registerMachine(
+  request: Request,
+  response: Response,
+  next: any,
+) {
   try {
     const { description, maintenance, name } =
       MachineRequestCreatedSchema.parse(request.body)
@@ -21,19 +26,12 @@ export async function registerMachine(request: Request, response: Response) {
 
     return response.status(201).send('Maquinário cadastrado com sucesso!')
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errorsZodResponse = error.issues.map((issue) => {
-        return {
-          message: issue.message,
-          path: issue.path[0],
-        }
+    if (error instanceof SameNameMachineError) {
+      return response.status(409).json({
+        message: error.message,
       })
-
-      return response.status(404).json(errorsZodResponse)
-    } else {
-      console.log(error)
-
-      return response.status(500).json()
     }
+
+    next(error)
   }
 }

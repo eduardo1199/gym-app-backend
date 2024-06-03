@@ -4,15 +4,18 @@ import { PrismaPlanRepository } from '../../repositories/plan-repository/prisma-
 import { ParamsIdRequestSchema } from '../../schemas/params-request-id'
 import { PlanEditSchema } from '../../schemas/plan'
 import { UpdatePlanUseCase } from '../../use-cases/plan-use-cases/update-plan'
+import { NotFoundError } from '../../err/not-found-error'
+import { SameNameOrPeriodTimePlanError } from '../../err/same-name-or-time-plan-error'
 
 export async function updatePlanController(
   request: Request,
   response: Response,
+  next: any,
 ) {
   try {
     const { id } = ParamsIdRequestSchema.parse(request.params)
 
-    const { price, timeOfPlan, name } = PlanEditSchema.parse(request.body)
+    const { price, plan_month_time, name } = PlanEditSchema.parse(request.body)
 
     const plansRepository = new PrismaPlanRepository()
     const updatePlanUseCase = new UpdatePlanUseCase(plansRepository)
@@ -21,22 +24,20 @@ export async function updatePlanController(
       id,
       name: name ?? undefined,
       price: price ?? undefined,
-      timeOfPlan: timeOfPlan ?? undefined,
+      plan_month_time: plan_month_time ?? undefined,
     })
 
     return response.status(204).send('Plano atulizado com sucesso!')
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errorsZodResponse = error.issues.map((issue) => {
-        return {
-          message: issue.message,
-          path: issue.path[0],
-        }
+    if (
+      error instanceof NotFoundError ||
+      error instanceof SameNameOrPeriodTimePlanError
+    ) {
+      return response.status(409).json({
+        message: error.message,
       })
-
-      return response.status(404).json(errorsZodResponse)
-    } else {
-      return response.status(500).json(error)
     }
+
+    next(error)
   }
 }

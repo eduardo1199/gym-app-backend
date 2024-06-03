@@ -7,6 +7,7 @@ import { admin } from './http/admin-routes'
 import { machines } from './http/machines-routes'
 import { users } from './http/users-routes'
 import { plans } from './http/plans-routes'
+import { zodErrorMiddleware } from './middleware/error-middleware'
 
 const app = express()
 
@@ -17,5 +18,7 @@ app.use('/admin', admin)
 app.use('/machines', machines)
 app.use('/users', users)
 app.use('/plans', plans)
+
+app.use(zodErrorMiddleware)
 
 app.listen(env.PORT)

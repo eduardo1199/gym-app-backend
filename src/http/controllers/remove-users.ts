@@ -4,8 +4,13 @@ import { RemoveUserUseCase } from '../../use-cases/users-cases/remove-user'
 import { z } from 'zod'
 import { ParamsIdRequestSchema } from '../../schemas/params-request-id'
 import { StatusCodeErrors } from '../../err/status.code-errors'
+import { NotFoundError } from '../../err/not-found-error'
 
-export async function deleteUser(request: Request, response: Response) {
+export async function deleteUser(
+  request: Request,
+  response: Response,
+  next: any,
+) {
   try {
     const { id } = ParamsIdRequestSchema.parse(request.params)
 
@@ -18,17 +23,12 @@ export async function deleteUser(request: Request, response: Response) {
       .status(StatusCodeErrors.ACCEPTED)
       .send('Usuário removido com sucesso!')
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errorsZodResponse = error.issues.map((issue) => {
-        return {
-          message: issue.message,
-          path: issue.path[0],
-        }
+    if (error instanceof NotFoundError) {
+      return response.status(409).json({
+        message: error.message,
       })
-
-      return response.status(404).json(errorsZodResponse)
-    } else {
-      return response.status(500).json(error)
     }
+
+    next(error)
   }
 }

@@ -6,8 +6,13 @@ import {
 import { z } from 'zod'
 import { UpdateMachineUseCase } from '../../use-cases/machine-use-cases/update-machine-use-case'
 import { PrismaMachineRepository } from '../../repositories/machine-repository/prisma-machine-repository'
+import { NotFoundError } from '../../err/not-found-error'
 
-export async function updateMachine(request: Request, response: Response) {
+export async function updateMachine(
+  request: Request,
+  response: Response,
+  next: any,
+) {
   try {
     const { description, maintenance, name } = MachineRequestUpdateSchema.parse(
       request.body,
@@ -28,19 +33,12 @@ export async function updateMachine(request: Request, response: Response) {
 
     return response.status(201).send('Maquinário atualizado com sucesso!')
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errorsZodResponse = error.issues.map((issue) => {
-        return {
-          message: issue.message,
-          path: issue.path[0],
-        }
+    if (error instanceof NotFoundError) {
+      return response.status(409).json({
+        message: error.message,
       })
-
-      return response.status(404).json(errorsZodResponse)
-    } else {
-      console.log(error)
-
-      return response.status(500).json()
     }
+
+    next(error)
   }
 }

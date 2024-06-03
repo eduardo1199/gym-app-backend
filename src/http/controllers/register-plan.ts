@@ -3,13 +3,15 @@ import { PlanSchema } from '../../schemas/plan'
 import { PrismaPlanRepository } from '../../repositories/plan-repository/prisma-plan-repository'
 import { CreatePlanUseCase } from '../../use-cases/plan-use-cases/create-plan'
 import { z } from 'zod'
+import { SameNameOrPeriodTimePlanError } from '../../err/same-name-or-time-plan-error'
 
 export default async function RegisterPlan(
   request: Request,
   response: Response,
+  next: any,
 ) {
   try {
-    const { name, price, timeOfPlan } = PlanSchema.parse(request.body)
+    const { name, price, plan_month_time } = PlanSchema.parse(request.body)
 
     const planRepository = new PrismaPlanRepository()
 
@@ -18,24 +20,17 @@ export default async function RegisterPlan(
     await registerPlanUseCase.execute({
       name,
       price,
-      timeOfPlan,
+      plan_month_time,
     })
 
     return response.status(201).send('Plano cadastrado com sucesso!')
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errorsZodResponse = error.issues.map((issue) => {
-        return {
-          message: issue.message,
-          path: issue.path[0],
-        }
+    if (error instanceof SameNameOrPeriodTimePlanError) {
+      return response.status(409).json({
+        message: error.message,
       })
-
-      return response.status(404).json(errorsZodResponse)
-    } else {
-      /*  console.log(error) */
-
-      return response.status(500).json()
     }
+
+    next(error)
   }
 }

@@ -14,7 +14,9 @@ export const registerUserSchema = z.object({
       invalid_type_error: 'Peso precisa ser um número!',
     })
     .positive(),
-  startDateForPlan: z.string().optional(),
+  start_plan_date: z.string({
+    required_error: 'Data de início obrigatória',
+  }),
   cpf: z
     .string({
       required_error: 'CPF obrigatório!',
@@ -40,7 +42,7 @@ export const UserEditSchema = z.object({
   name: z.string().optional(),
   age: z.number().optional(),
   weight: z.number().positive().optional(),
-  startDateForPlan: z.string().optional(),
+  start_plan_date: z.string().optional(),
   cpf: z.string().max(14).optional(),
   planId: z.string().uuid().optional(),
 })
