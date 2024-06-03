@@ -11,14 +11,25 @@ export async function updateUser(request: Request, response: Response) {
   try {
     const { id } = ParamsIdRequestSchema.parse(request.params)
 
-    const user = UserEditSchema.parse(request.body)
+    const { age, cpf, name, planId, start_plan_date, weight } =
+      UserEditSchema.parse(request.body)
 
     const userRepository = new PrismaUserRepository()
     const planRepository = new PrismaPlanRepository()
 
-    const registerUseCase = new EditUserUseCase(userRepository, planRepository)
+    const editUserUseCase = new EditUserUseCase(userRepository, planRepository)
 
-    await registerUseCase.execute(user, id)
+    await editUserUseCase.execute(
+      {
+        age,
+        cpf,
+        name,
+        planId,
+        start_plan_date,
+        weight,
+      },
+      id,
+    )
 
     return response
       .status(StatusCodeErrors.UPDATE_SUCCESS)

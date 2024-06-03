@@ -8,7 +8,7 @@ import { env } from '../../env'
 
 export async function registerAdmin(request: Request, response: Response) {
   try {
-    const { cpf, name, birthDate, password, year } = AdminRegisterSchema.parse(
+    const { cpf, name, birth_date, password, year } = AdminRegisterSchema.parse(
       request.body,
     )
 
@@ -16,7 +16,7 @@ export async function registerAdmin(request: Request, response: Response) {
     const registerAdminUseCase = new RegisterAdminUseCase(adminRepository)
 
     const { admin } = await registerAdminUseCase.execute({
-      birthDate,
+      birth_date,
       cpf,
       name,
       password,

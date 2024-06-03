@@ -12,7 +12,7 @@ export async function updatePlanController(
   try {
     const { id } = ParamsIdRequestSchema.parse(request.params)
 
-    const { price, timeOfPlan, name } = PlanEditSchema.parse(request.body)
+    const { price, plan_month_time, name } = PlanEditSchema.parse(request.body)
 
     const plansRepository = new PrismaPlanRepository()
     const updatePlanUseCase = new UpdatePlanUseCase(plansRepository)
@@ -21,7 +21,7 @@ export async function updatePlanController(
       id,
       name: name ?? undefined,
       price: price ?? undefined,
-      timeOfPlan: timeOfPlan ?? undefined,
+      plan_month_time: plan_month_time ?? undefined,
     })
 
     return response.status(204).send('Plano atulizado com sucesso!')

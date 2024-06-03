@@ -10,7 +10,7 @@ interface EditUserUseCaseRequest {
   name?: string
   planId?: string
   weight?: number
-  startDateForPlan?: string
+  start_plan_date?: string
 }
 
 interface EditUserUseCaseResponse {

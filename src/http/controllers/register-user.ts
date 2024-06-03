@@ -7,7 +7,7 @@ import { PrismaPlanRepository } from '../../repositories/plan-repository/prisma-
 
 export async function registerUser(request: Request, response: Response) {
   try {
-    const { age, cpf, name, planId, weight, startDateForPlan } =
+    const { age, cpf, name, planId, weight, start_plan_date } =
       registerUserSchema.parse(request.body)
 
     const userRepository = new PrismaUserRepository()
@@ -21,7 +21,7 @@ export async function registerUser(request: Request, response: Response) {
       name,
       planId,
       weight,
-      startDateForPlan,
+      start_plan_date,
     })
 
     return response.status(201).send('Aluno cadastrado com sucesso!')

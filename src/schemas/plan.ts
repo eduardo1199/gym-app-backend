@@ -5,7 +5,7 @@ export const PlanSchema = z.object({
     required_error: 'Nome obrigatório!',
     invalid_type_error: 'Nome precisa ser do tipo texto!',
   }),
-  timeOfPlan: z
+  plan_month_time: z
     .number({
       required_error: 'Tempo do plano obrigatório!',
       invalid_type_error: 'Tempo do plano precisa ser numérico!',
@@ -28,7 +28,7 @@ export const ParamsIdSchema = z.object({
 
 export const PlanEditSchema = z.object({
   name: z.string().optional().nullable(),
-  timeOfPlan: z
+  plan_month_time: z
     .number()
     .max(360, {
       message: 'Tempo do plano não pode ser superior a um ano!',

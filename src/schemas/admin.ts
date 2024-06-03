@@ -17,7 +17,7 @@ export const AdminRegisterSchema = z.object({
       invalid_type_error: 'Formator de CPF inválido!',
     })
     .max(14),
-  birthDate: z.string({
+  birth_date: z.string({
     required_error: 'Data obrigatória!',
     invalid_type_error: 'Data precisa ser no formato dd/MM/YYYY!',
   }),

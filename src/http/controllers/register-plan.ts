@@ -9,7 +9,7 @@ export default async function RegisterPlan(
   response: Response,
 ) {
   try {
-    const { name, price, timeOfPlan } = PlanSchema.parse(request.body)
+    const { name, price, plan_month_time } = PlanSchema.parse(request.body)
 
     const planRepository = new PrismaPlanRepository()
 
@@ -18,7 +18,7 @@ export default async function RegisterPlan(
     await registerPlanUseCase.execute({
       name,
       price,
-      timeOfPlan,
+      plan_month_time,
     })
 
     return response.status(201).send('Plano cadastrado com sucesso!')
