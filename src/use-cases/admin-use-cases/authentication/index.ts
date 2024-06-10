@@ -22,8 +22,6 @@ export class AuthenticationAdminUseCase {
 
     const isPasswordMath = await compare(password, admin.password)
 
-    console.log(password, admin.password)
-
     if (!isPasswordMath) {
       throw new NotMatchPasswordOrCPF()
     }
