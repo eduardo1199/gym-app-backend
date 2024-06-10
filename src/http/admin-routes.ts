@@ -6,6 +6,6 @@ import { authenticateAdmin } from './controllers/authentication-admin'
 
 export const admin = express()
 
-admin.post('/', verifyJWT, registerAdmin)
+admin.post('/', registerAdmin)
 admin.get('/:id', verifyJWT, getAdmin)
 admin.post('/authentication', authenticateAdmin)

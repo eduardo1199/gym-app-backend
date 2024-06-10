@@ -14,9 +14,7 @@ export async function getUser(request: Request, response: Response, next: any) {
 
     const user = await getUserCase.execute({ id })
 
-    return response.status(200).json({
-      user,
-    })
+    return response.status(200).json(user)
   } catch (error) {
     if (error instanceof NotFoundError) {
       return response.status(409).json({

@@ -8,5 +8,5 @@ export async function getAllUsers(request: Request, response: Response) {
 
   const users = await getAllUsersCase.execute()
 
-  return response.status(200).json({ users })
+  return response.status(200).json(users)
 }
