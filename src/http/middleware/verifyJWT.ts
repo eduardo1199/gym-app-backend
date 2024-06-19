@@ -23,6 +23,7 @@ export async function verifyJWT(
     if (error) {
       return res.status(406).send({
         message: 'Failed to authenticate token.',
+        error: 'NOT_AUTHORIZATION',
         auth: false,
       })
     }
