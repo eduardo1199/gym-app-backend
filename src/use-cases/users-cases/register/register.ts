@@ -44,7 +44,7 @@ export class RegisterUseCase {
     const startForPlanDateFormat = new Date(userParams.start_plan_date)
 
     const endForPlanDateFormat = add(startForPlanDateFormat, {
-      days: plan.plan_month_time,
+      months: plan.plan_month_time,
     })
 
     const { age, cpf, name, planId, weight } = userParams
