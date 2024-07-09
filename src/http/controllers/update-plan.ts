@@ -27,7 +27,7 @@ export async function updatePlanController(
       plan_month_time: plan_month_time ?? undefined,
     })
 
-    return response.status(204).send('Plano atulizado com sucesso!')
+    return response.status(204).send('Plano atualizado com sucesso!')
   } catch (error) {
     if (
       error instanceof NotFoundError ||
